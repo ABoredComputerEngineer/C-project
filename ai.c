@@ -57,7 +57,7 @@ game gameBoard;
 int turn = 1;
 const int aiPlayer = 1;
 const int humanPlayer = 0;
-const int maxDepth = 2;
+const int maxDepth = 3;
 
 
 /* Declarations and definitions of functions */
@@ -181,9 +181,11 @@ int aiMove( ){
 	return getBestMove(aiPlayer , 0).move;
 }
 
+aiBoard getRandomMove( aiBoard *board, int player );
 int main( ){
 	// delay( 5 );
 	int i, cell, player = humanPlayer ;
+	srand(time(NULL));
 	// move newMove;
 	initializeBoard();
 	printBoard();
@@ -228,7 +230,8 @@ int main( ){
 aiBoard getBestMove( int player , int depth ){
 	int i,score,rv,x = 0;
 	aiBoard *new = newBoard() ;
-	aiBoard min = { 1000, GARBAGE},max = { -1000, GARBAGE };
+	// aiBoard min = { 1000, GARBAGE},max = { -1000, GARBAGE };
+	aiBoard move;
 	rv = hasEnded();
 	// printf("%d\n",rv);
 	if ( rv != 0 || depth == maxDepth){  // game has  Ended
@@ -264,26 +267,56 @@ aiBoard getBestMove( int player , int depth ){
 	putchar('\n');
 
 
+	move = getRandomMove( new, player );
+	free(new);
+	return move;
 
-	if ( player == aiPlayer ){
-		for ( i = 0; new[i].score != GARBAGE && i<9; i++ ){
-			if ( max.score < new[i].score )
-				max = new[i];
-		}
-		free(new);
-		// printf("Max Score:%d \t Move:%d\n",max.score,max.move);
-		return max;
-	} else {
-		for ( i = 0; new[i].score!= GARBAGE && i<9; i++ )
-			if ( min.score>new[i].score )
-				min = new[i];
-		free(new);
-		// printf("Min Score:%d \t Move:%d\n",min.score,min.move);
-		// printf("%d\n",min.score);
-		return min;
-	}
+	// if ( player == aiPlayer ){
+	// 	for ( i = 0; new[i].score != GARBAGE && i<9; i++ ){
+	// 		if ( max.score < new[i].score )
+	// 			max = new[i];
+	// 	}
+	// 	free(new);
+	// 	// printf("Max Score:%d \t Move:%d\n",max.score,max.move);
+	// 	return max;
+	// } else {
+	// 	for ( i = 0; new[i].score!= GARBAGE && i<9; i++ )
+	// 		if ( min.score>new[i].score )
+	// 			min = new[i];
+	// 	free(new);
+	// 	// printf("Min Score:%d \t Move:%d\n",min.score,min.move);
+	// 	// printf("%d\n",min.score);
+	// 	return min;
+	// }
 
 }
 
 
 
+aiBoard getRandomMove( aiBoard board[], int player){
+	int bestScore;
+	aiBoard bestMoveList[9];
+	int i,k=0;
+
+	if ( player == aiPlayer ){
+		bestScore = -1000;
+		for ( i = 0; i<9 && board[i].score != GARBAGE; i++ ){
+			if ( board[i].score > bestScore )
+				bestScore = board[i].score;
+		}
+	} else {
+		bestScore = 1000;
+		for ( i = 0; i<9 && board[i].score!=GARBAGE; i++ ){
+			if ( board[i].score < bestScore )
+				bestScore = board[i].score;
+		}
+	}
+
+	for ( i = 0; i<9 && board[i].score != GARBAGE; i++ ){
+		if ( bestScore == board[i].score )
+			bestMoveList[k++] = board[i];
+	}
+
+	return bestMoveList[rand() % k];
+
+}
