@@ -1,38 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
 
-#define BOARD 9
-#define BOARD_ROW 3
-#define BOARD_COL 3
-#define PLAYER1 1
-#define PLAYER2 2
-#define P1_WIN 1
-#define P2_WIN 2
-#define TIE 3
-#define TRUE 1
-#define FALSE 0 
-#define GARBAGE 322
-#define AI 1
-#define HUMAN 0
-
-typedef struct game {
-	char mat[BOARD_ROW][BOARD_COL];// The game board stored in matrix form
-	char row[BOARD]; //The game board stored in a single array
-} game; 
-
-typedef struct aiBoard {
-	int score;
-	int move;
-} aiBoard;
-
-typedef struct player {
-	short int type;
-	short int position;
-	char sign;
-} player;
-
+#include "game.h"
 
 aiBoard *newBoard( void ){
 	int i;
@@ -47,8 +14,6 @@ aiBoard *newBoard( void ){
 /* Declaration of the Global Variables */
 game gameBoard;
 int turn = 1;
-// const int aiPlayer = 2;
-// const int humanPlayer = 1;
 short int maxDepth;
 player player1,player2,ai,human;
 
@@ -165,11 +130,7 @@ int getMove( void ){
 		if ( strlen(in) == 1 ){
 			if ( isLegal(ctoi(in[0])) )
 				return ctoi(in[0]);
-		//	else 
-		//		printf("\nInvalid Move\n");
-		}// else {
-		//	printf("\nInvalid Move\n");
-		//}
+		}
 	printf("\nInvalid Move\n");
 	}
 	
@@ -181,6 +142,54 @@ int aiMove(  ){
 
 aiBoard getRandomMove( aiBoard *board, player current );
 int evaluateBoard(void);
+
+void playGame(int mode){
+	int winner;
+	printBoard();
+	if ( mode == SINGLE ){
+		winner = playSingle();
+	} else {
+		winner = playDouble();
+	}
+	if ( winner == PLAYER1 ){
+		printf("Player 1 wins!!!\n");
+	} else if (winner == PLAYER2) {
+		printf("Player 2 wins!!!\n");
+	} else {
+		printf("The game has been drawn\n");
+	}
+}
+
+int playSingle( void ){
+	player current = player1;
+	int cell;
+	ai = ( player1.type == AI )?player1:player2;
+	human = ( player1.type == HUMAN )?player1:player2;
+	setDepth();
+	while ( !hasEnded() ){
+		if ( current.type == AI )
+			cell = aiMove();
+		else 
+			cell = getMove();
+		performMove(cell, current.position);
+		current = ( current.position == PLAYER1 )?player2:player1;		
+		printBoard();
+	}
+	return hasEnded();
+}
+
+int playDouble( void ){
+	player current = player1;
+	int cell,rv;
+	while ( !(rv=hasEnded()) ){
+		cell = getMove();
+		performMove(cell,current.position);
+		current = ( current.position == PLAYER1 )?player2:player1;
+		printBoard();
+	}
+	return rv;
+}
+
 int main( ){
 	// delay( 5 );
 	int i, cell;
@@ -208,25 +217,26 @@ int main( ){
 	player2.sign = 'X';
 
 	}
-	ai = ( player1.type == AI )?player1:player2;
-	human = ( player1.type == HUMAN )?player1:player2;
-	setDepth();
-	current = player1;
+	// ai = ( player1.type == AI )?player1:player2;
+	// human = ( player1.type == HUMAN )?player1:player2;
+	// setDepth();
+	// current = player1;
 	srand(time(NULL));
 	initializeBoard();
-	printBoard();
-	while ( !hasEnded() ){
-		if ( current.type == AI ){
-			cell = aiMove();
-		} else {
+	// printBoard();
+	// while ( !hasEnded() ){
+	// 	if ( current.type == AI ){
+	// 		cell = aiMove();
+	// 	} else {
 
-			cell = getMove();
-		}
-		performMove(cell, current.position);	
-		printBoard();
-		turn++;
-		current = ( current.position == PLAYER1 )?player2:player1;
-	}
+	// 		cell = getMove();
+	// 	}
+	// 	performMove(cell, current.position);	
+	// 	printBoard();
+	// 	turn++;
+	// 	current = ( current.position == PLAYER1 )?player2:player1;
+	// }
+	playGame(DOUBLE);
 	return 0;
 }
 
@@ -240,12 +250,6 @@ aiBoard getBestMove( player current , int depth ){
 	if ( rv != 0 || depth == maxDepth){  // game has  Ended
 		aiBoard x;
 		x.move = GARBAGE;
-		// if ( rv == PLAYER1 )
-		// 	x.score = -10;
-		// else if ( rv == PLAYER2 )
-		// 	x.score = 10;
-		// else 
-		// 	x.score = 0;
 		x.score = evaluateBoard();
 		free( new );
 		return x;
@@ -309,50 +313,6 @@ aiBoard getRandomMove( aiBoard board[], player current){
 
 int evaluateBoard( ){
 	short int row,col,i,j,wins = 0,values[8],sumRow=0,sumCol = 0,k=0;
-	// player ai,human;
-
-
-	// /* Now the  game is stored in a 3x3 matrix*/
-	// for ( row = 0; row<3; row++ ){
-	// 	for ( col = 0; col<3; col++ )
-	// 		gameBoard.mat[row][col] = gameBoard.row[k++];
-	// }
-	// k = 0;
-	// //Evaluate the rows and columns
-	// for ( row = 0; row < 3; row++ ){
-	// 	for ( col = 0; col < 3; col++ ){
-	// 		if ( gameBoard.mat[row][col] == ai.sign )
-	// 			sumRow+=1;
-	// 		else if ( gameBoard.mat[row][col] == human.sign )
-	// 			sumRow -= 1;
-	// 		if ( gameBoard.mat[col][row] == ai.sign )
-	// 			sumCol += 1;
-	// 		else if ( gameBoard.mat[col][row] == human.sign )
-	// 			sumCol-=1;
-	// 	}
-	// 	values[k++] = sumRow;
-	// 	values[k++] = sumCol;
-	// 	sumCol = 0;
-	// 	sumRow = 0;
-	// }
-
-	// //Evaluate the diagonals
-	// for  ( row = 0; row<3; row++ ){
-	// 	if ( gameBoard.mat[row][row] == ai.sign )
-	// 		sumRow+=1;
-	// 	else if ( gameBoard.mat[row][row] == human.sign )
-	// 		sumRow-=1;
-	// }
-	// sumRow = 0;
-	// values[k++] = sumRow;
-	// for ( row = 0; row<3 ; row++ ){
-	// 	if ( gameBoard.mat[row][2-row] == ai.sign )
-	// 		sumRow+=1;
-	// 	else if ( gameBoard.mat[row][2-row] == human.sign )
-	// 		sumRow-=1; 
-	// }
-	// values[k++] = sumRow;
-	// quickSort( values, 0, k-1 );
 
 	for ( j = 0; j<7; j+= 3 ){
 		for ( i = 0; i<3; i++){
@@ -360,45 +320,35 @@ int evaluateBoard( ){
 				sumRow--;
 			else if ( gameBoard.row[i+j] == ai.sign )
 				sumRow++;
-		// printf("%d\t",sumRow);
 		}
-	// printf("\n");
 		values[k++] = sumRow;
 		sumRow = 0;
 	}
-		// printf("\n");
 	for ( j = 0; j<3; j++ ){
 		for ( i = j; i<9; i+=3 ){
 			if ( gameBoard.row[i] == ai.sign )
 				sumRow++;
 			else if ( gameBoard.row[i] == human.sign)
 				sumRow--;
-			// printf("%d\t",sumRow);
 		}
-		// printf("\n");
 		values[k++] = sumRow;
 		sumRow = 0;
 	}
-	// printf("\n");
 	for ( i = 0; i<9 ; i+= 4){
 		if ( gameBoard.row[i] == ai.sign )
 			sumRow++;
 		else if (gameBoard.row[i] == human.sign )
 			sumRow--;
-		// printf("%d\t",sumRow);
 	}
-	// printf("\n");
 	values[k++] = sumRow;
 	sumRow = 0;
-	// printf("\n");
 	for ( i = 6; i>0; i-=2 ){
 		if ( gameBoard.row[i] == ai.sign)
 			sumRow++;
 		else if (gameBoard.row[i] == human.sign )
 			sumRow--;
-		// printf("%d\t",sumRow);
 	}
-	// printf("\n");
+
 	values[k++] = sumRow;
 	sumRow = 0;
 
