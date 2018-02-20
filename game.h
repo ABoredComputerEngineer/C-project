@@ -34,6 +34,12 @@ typedef struct player {
 	char sign;
 } player;
 
+typedef struct settings {
+	player *p1;
+	player *p2;
+	int difficulty;
+} settings;
+
 aiBoard *newBoard( void );
 void setDepth( void );
 int ctoi( char c );
@@ -46,3 +52,9 @@ int getMove( void );
 void playGame(int);
 int playSingle(void);
 int playDouble(void);
+
+/* Declaration of the Global Variables */
+game gameBoard;
+int turn = 1;
+short int maxDepth;
+player player1,player2,ai,human;
