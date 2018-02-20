@@ -11,11 +11,7 @@ aiBoard *newBoard( void ){
 }
 
 
-/* Declaration of the Global Variables */
-game gameBoard;
-int turn = 1;
-short int maxDepth;
-player player1,player2,ai,human;
+
 
 /* Declarations and definitions of functions */
 
@@ -161,7 +157,7 @@ void playGame(int mode){
 }
 
 int playSingle( void ){
-	player current = player1;
+	player current = player2;
 	int cell;
 	ai = ( player1.type == AI )?player1:player2;
 	human = ( player1.type == HUMAN )?player1:player2;
@@ -179,7 +175,7 @@ int playSingle( void ){
 }
 
 int playDouble( void ){
-	player current = player1;
+	player current = player2;
 	int cell,rv;
 	while ( !(rv=hasEnded()) ){
 		cell = getMove();
@@ -236,7 +232,7 @@ int main( ){
 	// 	turn++;
 	// 	current = ( current.position == PLAYER1 )?player2:player1;
 	// }
-	playGame(DOUBLE);
+	playGame(SINGLE);
 	return 0;
 }
 
