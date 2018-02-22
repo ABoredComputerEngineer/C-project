@@ -17,6 +17,14 @@
 #define SINGLE 1
 #define DOUBLE 2
 
+#define MAX_OPTIONS 3
+#define MAX_IDENTIFIERS 7
+#define MAX_COMMANDS 4
+#define IN 1
+#define OUT 0
+
+
+#define NEWLINE printf("---------------------------------------------\n")
 typedef struct game {
 	char mat[BOARD_ROW][BOARD_COL];// The game board stored in matrix form
 	char row[BOARD]; //The game board stored in a single array
@@ -37,8 +45,12 @@ typedef struct player {
 typedef struct settings {
 	player *p1;
 	player *p2;
+	player ai;
 	int difficulty;
+	int win;
+	int loss;
 } settings;
+
 
 aiBoard *newBoard( void );
 void setDepth( void );
@@ -53,8 +65,35 @@ void playGame(int);
 int playSingle(void);
 int playDouble(void);
 
+
+typedef struct command {
+	char name[10];
+	struct identifier *identifierList[3];
+} command;
+
+
+typedef struct identifier {
+	char name[15];
+	struct option *optionList[4];
+} identifier;
+
+
+typedef struct option{
+	char name[50];
+	char identifierType[15];
+	char value[100];
+	// struct option *next;
+} option;
+
+
+enum difficulty {EASY=1,MEDIUM,HARD};
+enum tokens {COMMAND,IDENTIFIER,OPTION,VALUE};
+enum commands {set,new,view};
+
 /* Declaration of the Global Variables */
 game gameBoard;
 int turn = 1;
 short int maxDepth;
 player player1,player2,ai,human;
+settings gameSet;
+
