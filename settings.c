@@ -1,36 +1,5 @@
 #include "game.h"
-#include <assert.h>
 
-#define MAX_OPTIONS 3
-#define MAX_IDENTIFIERS 7
-#define MAX_COMMANDS 4
-#define IN 1
-#define OUT 0
-
-
-typedef struct command {
-	char name[10];
-	struct identifier *identifierList[3];
-	struct option *exOption;
-} command;
-
-
-typedef struct identifier {
-	char name[10];
-	struct option *optionList[4];
-} identifier;
-
-
-typedef struct option{
-	char name[10];
-	char identifierType[10];
-	char value[100];
-	// struct option *next;
-} option;
-
-enum difficulty {EASY=1,MEDIUM,HARD};
-enum tokens {COMMAND,IDENTIFIER,OPTION,VALUE};
-enum commands {set,new,view};
 
 // Splits a string removing whitespaces and stores them in an array of strings
 int stringSplit(char [], char [][100] );
@@ -42,6 +11,14 @@ command *matchCommand(char [][100]);
 // Matches a identifier in the idenfier list of the given command index
 identifier *matchIdentifier( command * , char [][100] );
 void parseCommand(char [][100], int);
+option *parseSet(command *,char [][100], int);
+void parseNew(command *,char [][100], int);
+void parseView(command *,char [][100], int);
+void parseExit(command *,char [][100], int);
+void setOptions(option *);
+void applyDefault( void );
+void displaySettings( void );
+
 	command commandList[MAX_COMMANDS];
 	identifier identifierList[MAX_IDENTIFIERS];
 	option optionList[MAX_OPTIONS];
@@ -50,7 +27,6 @@ void buildCommandTree(){
 	for ( i = 0; i<MAX_COMMANDS; i++ ){
 		for ( j = 0; j<3; j++ )
 			commandList[i].identifierList[j] = NULL;
-		commandList[i].exOption = NULL;
 	}
 
 	for ( i = 0; i<MAX_IDENTIFIERS; i++ ){
@@ -65,14 +41,14 @@ void buildCommandTree(){
 	commandList[0].identifierList[0] = &identifierList[0]; // identiferList[0] is player 1
 	commandList[0].identifierList[1] = &identifierList[1]; // identifierList[1] is player 2
 	commandList[0].identifierList[2] = &identifierList[2]; // identifierList[2] is ai
-	commandList[0].exOption = &optionList[2]; // equivaluent to set difficulty
+	// commandList[0].exOption = &optionList[2]; // equivaluent to set difficulty
 
 
-	strcpy(identifierList[0].name ,"player1");
+	strcpy(identifierList[0].name ,"p1");
 	identifierList[0].optionList[0] = &optionList[0]; // name option
 	identifierList[0].optionList[1] = &optionList[1]; // Symbol option
 
-	strcpy(identifierList[1].name ,"player2");
+	strcpy(identifierList[1].name ,"p2");
 	identifierList[1].optionList[0] = &optionList[0]; // name option
 	identifierList[1].optionList[1] = &optionList[1]; // Symbol option
 
@@ -94,18 +70,18 @@ void buildCommandTree(){
 	strcpy(identifierList[6].name , "score");
 
 	strcpy(optionList[0].name , "name" );
-	strcpy(optionList[1].name , "symbol");
-	strcpy(optionList[2].name , "difficulty");
+	strcpy(optionList[1].name , "sign");
+	strcpy(optionList[2].name , "mode");
 
 }
 
 
 int main(){
-	int i,k;
-	command *j;
-	option *new;
+	int k;
 	buildCommandTree();
-
+	gameSet.p1 = &player1;
+	gameSet.p2 = &player2;
+	gameSet.difficulty = EASY;
 	char command[100];
 	char tokenList[10][100];
 	while ( 1) {
@@ -113,9 +89,11 @@ int main(){
 		scanf("%[^\n]",command);
 		getchar();
 		k = stringSplit(command,tokenList);
-		printf("tokens : %d\n",k);
+		// printf("tokens : %d\n",k);
 		
 		parseCommand(tokenList, k);
+		// printf("%d\n",gameSet.difficulty);
+		displaySettings();
 	}
 }
 
@@ -129,120 +107,32 @@ command *matchCommand( char tokenList[][100] ){
 	return NULL;
 }
 
-// identifier *matchIdentifier(command *current, char tokenList[][100]){
-// 	int i;
-// 	for ( i = 0 ; current->identifierList[i] != NULL ; i++ ){	
-// 		if ( strcmp(current->identifierList[i]->name,tokenList[IDENTIFIER]) == 0 )
-// 			return i;
-// 	}
-
-// 	if ( current->exOption != NULL ){ // The given command has an extra option
-
-// 		if ( strcmp(current->exOption->name,tokenList[IDENTIFIER]) == 0 ) // If the second identifier is an option instead eg. "set difficulty"
-// 			return 10;
-// 	}
-// 	return -1;
-// }
-
 
 void parseCommand(char tokenList[][100], int tokens){ // tokens is the number of tokens 
-	int i;
+	// int i;
 	command *current = NULL;
-	identifier *identify = NULL;
+	// identifier *identify = NULL;
 	option *opt = NULL;
 	current = matchCommand(tokenList);
 
 	if ( current == NULL ){
 		return;
-	} else if ( strcmp(current->name,"set") == 0 ){
-		printf("\n%s\n",current->name);
-		for ( i = 0; i<3 && current->identifierList[i] != NULL ; i++ ){
-			if ( strcmp(current->identifierList[i]->name, tokenList[IDENTIFIER]) == 0 ){
-				identify = current->identifierList[i];
-			}
+	} else if ( strcmp(current->name,"set") == 0 ){  // If the command is to change the settings
+		opt  = parseSet(current,tokenList,tokens);
+		if ( opt != NULL ){
+			setOptions(opt);
 		}
-		if (identify == NULL ) {
-			printf("identifier Not found\n");
-			return ;
-		}
-
-		for ( i = 0; i<4 && identify->optionList[i] != NULL ; i++ ){
-				if ( strcmp(identify->optionList[i]->name,tokenList[OPTION]) == 0 ){
-					opt = identify->optionList[i];
-					strcpy(opt->identifierType,identify->name);
-					strcpy(opt->value,tokenList[VALUE]);
-					printf("Writing to options\n");
-				}
-		}
-	} else if ( strcmp(current->name,"new") == 0){
-		printf("\n%s\n",current->name);
-		if ( tokens == 1 ){
-			printf("\nStarting a new game \n");
-		} else if ( strcmp(current->identifierList[0]->name, tokenList[IDENTIFIER]) == 0 ){
-			printf("\nStarting a single player game\n");
-		} else if ( strcmp(current->identifierList[1]->name, tokenList[IDENTIFIER]) == 0 ) {
-			printf("\nStarting two player game\n");
-		} else {
-			printf("Command  not recognized\n");
-			return;
-		}
-	} else if ( strcmp( current->name , "view") == 0 ){
-		printf("\n%s\n",current->name);
-		for ( i = 0; i<3 && current->identifierList[i] != NULL ; i++ ){
-			if ( strcmp(current->identifierList[i]->name, tokenList[IDENTIFIER]) == 0 ){
-				identify = current->identifierList[i];
-			}
-		} 
-		if ( identify == NULL ){
-			printf("\nInvlaid Command\n");
-			return;
-		}
-		if ( strcmp(identify->name, "score") == 0 ){
-			printf("\nDisplaying Score\n");
-		} else if ( strcmp(identify->name, "settings") == 0){
-			printf("\nDisplaying Settings\n");
-		} else {
-			printf("Command not recognized\n");
-			return;
-		}
+	} else if ( strcmp(current->name,"new") == 0){ // If the command is to start a new game
+		parseNew(current,tokenList,tokens);
+	} else if ( strcmp( current->name , "view") == 0 ){ // if the command is to view scores or settings
+		parseView(current,tokenList,tokens);
 
 	} else if ( strcmp(current->name,"exit") == 0){
 		exit(1);
+	} else {
+		printf("Invaid command\n");
 	}
 	return;
-	// for ( i = 0; i<3; i++ ){
-	// 	if ( strcmp(tokenList[COMMAND],commandList[i].name) == 0 ){
-	// 		current = &commandList[i];
-	// 	}
-	// }
-	// if ( current == NULL ){
-	// 	printf("Command Not found\n");
-	// 	return NULL;
-	// }
-
-	// for ( i = 0; i<7 && current->identifierList[i] != NULL ; i++ ){
-	// 	if ( strcmp(current->identifierList[i]->name, tokenList[IDENTIFIER]) == 0 ){
-	// 		identify = current->identifierList[i];
-	// 	}
-	// }
-
-	// if ( identify == NULL && current->exOption != NULL && ( strcmp(current->exOption->name,tokenList[IDENTIFIER]) == 0 ) ){
-	// 		opt = current->exOption;
-	// 		return NULL;
-	// } else if (identify == NULL ) {
-	// 	printf("identifier Not found\n");
-	// 	return NULL;
-	// }
-
-	// for ( i = 0; i<4 && identify->optionList[i] != NULL ; i++ ){
-	// 		if ( strcmp(identify->optionList[i]->name,tokenList[OPTION]) == 0 ){
-	// 			opt = identify->optionList[i];
-	// 			strcpy(opt->identifierType,identify->name);
-	// 			strcpy(opt->value,tokenList[VALUE]);
-	// 		}
-	// }
-
-	// return opt;
 
 }
 
@@ -276,5 +166,147 @@ int stringSplit( char in[], char out[][100]){
 }
 
 
+void setOptions(option *new ){
+
+	if ( strcmp(new->name,"name") == 0 ){
+		if ( strcmp(new->identifierType,"p1") == 0 ){
+			strcpy(player1.name,new->value);
+		} else if ( strcmp(new->identifierType,"p2") == 0) {
+			strcpy(player2.name,new->value);
+		} else {
+			strcpy(gameSet.ai.name,new->value);
+		}
+	} else if ( strcmp(new->name, "sign") == 0 ){
+		if ( strcmp(new->identifierType,"p1") == 0 ){
+			player1.sign = new->value[0];
+		} else {
+			player2.sign = new->value[0];
+		}
+	} else if ( strcmp(new->name, "mode") == 0 ){
+		if ( strcmp(new->value,"easy") == 0 ){
+			gameSet.difficulty = EASY;
+		} else if ( strcmp(new->value , "medium") == 0 ){
+			gameSet.difficulty = MEDIUM;
+		} else if ( strcmp(new->value,"hard") == 0 ){
+			gameSet.difficulty = HARD;
+		} else {
+			printf("\nValue not recognized\n");
+			return;
+		}
+	}
+}
 
 
+void displaySettings( void ){
+		printf("\nPlayer 1::: \n");
+		NEWLINE;
+		printf("%-8s:::%20s\n","Name",gameSet.p1->name);
+		printf("%-8s:::%4c\n","Sign",gameSet.p1->sign);
+	printf("\nPlayer 2::: \n");
+		NEWLINE;
+	printf("%-8s:::%20s\n","Name",gameSet.p2->name);
+	printf("%-8s:::%4c\n","Sign",gameSet.p2->sign);
+	printf("\nMarco Bot\n");
+	NEWLINE;
+	printf("%-8s:::%20s\n","Name",gameSet.ai.name);
+	printf("%-8s:::%4c\n","Name",gameSet.ai.sign);
+	printf("%-8s:::%6s\n","Name",(gameSet.difficulty == EASY )?"Easy":((gameSet.difficulty == MEDIUM)?"Medium":"Hard"));
+	
+}
+
+
+void applyDefault( void ){
+	strcpy(gameSet.p1->name,"Player 1");
+	gameSet.p1->sign = '0';
+	strcpy( gameSet.p2->name,"Player 2");
+	gameSet.p2->sign = 'X';
+	strcpy(gameSet.ai.name,"Marco Bot");
+	gameSet.ai.sign = '+';
+	gameSet.difficulty = EASY;
+}
+
+
+option *parseSet( command *current, char tokenList[][100] , int tokens ){
+	int i;
+	identifier *identify = NULL;
+	option *opt = NULL;
+	printf("\n%s\n",current->name);
+		if ( tokens != 4 ){
+			printf("\nInvalid arguments\n");
+			return NULL;
+		}
+		for ( i = 0; i<3 && current->identifierList[i] != NULL ; i++ ){
+			if ( strcmp(current->identifierList[i]->name, tokenList[IDENTIFIER]) == 0 ){
+				identify = current->identifierList[i];
+				break;
+			}
+		} 
+		if (identify == NULL ) {
+			printf("identifier Not found\n");
+			return NULL;
+		}
+
+		for ( i = 0; i<3 && identify->optionList[i] != NULL ; i++ ){
+			printf("\n%s \t %s \t %s \n",tokenList[OPTION],identify->optionList[i]->name,identify->name	);
+				if ( strcmp(identify->optionList[i]->name,tokenList[OPTION]) == 0 ){
+					opt = identify->optionList[i];
+					strcpy(opt->identifierType,identify->name);
+
+					strcpy(opt->value,tokenList[VALUE]);
+					printf("Writing to options\n");
+					// setOptions(opt);
+					return opt;
+				}
+		}
+		printf("Invalid options \n");
+		return NULL;
+
+}
+
+void parseNew(command *current, char tokenList[][100], int tokens ){
+	printf("\n%s\n",current->name);
+		if ( tokens > 2 ){
+			printf("Invalid number of arguments\n");
+			return;
+		}
+		if ( tokens == 1 ){
+			printf("\nStarting a new game \n");
+		} else if ( strcmp(current->identifierList[0]->name, tokenList[IDENTIFIER]) == 0 ){
+			printf("\nStarting a single player game\n");
+		} else if ( strcmp(current->identifierList[1]->name, tokenList[IDENTIFIER]) == 0 ) {
+			printf("\nStarting two player game\n");
+		} else {
+			printf("Command  not recognized\n");
+			return;
+		}
+
+}
+
+void parseView( command *current, char tokenList[][100], int tokens ){
+	identifier *identify = NULL;
+	int i;
+	printf("\n%s\n",current->name);
+		if  (tokens != 2  ){
+			printf("Invalid number of arguments\n");
+			return;
+		}
+		for ( i = 0; i<3 && current->identifierList[i] != NULL ; i++ ){
+			if ( strcmp(current->identifierList[i]->name, tokenList[IDENTIFIER]) == 0 ){
+				identify = current->identifierList[i];
+				break;
+			}
+		} 
+		if ( identify == NULL ){
+			printf("\nInvlaid Command\n");
+			return;
+		}
+		if ( strcmp(identify->name, "score") == 0 ){
+			printf("\nDisplaying Score\n");
+		} else if ( strcmp(identify->name, "settings") == 0){
+			printf("\nDisplaying Settings\n");
+		} else {
+			printf("Command not recognized\n");
+			return;
+		}
+
+}
