@@ -157,7 +157,7 @@ void playGame(int mode){
 }
 
 int playSingle( void ){
-	player current = player2;
+	player current = player1;
 	int cell;
 	ai = ( player1.type == AI )?player1:player2;
 	human = ( player1.type == HUMAN )?player1:player2;
@@ -188,8 +188,8 @@ int playDouble( void ){
 
 int main( ){
 	// delay( 5 );
-	int i, cell;
-	player current;
+	// int i, cell;
+	// player current;
 	char decision;
 	
 	printf("\nFirst Move or Second Move? ( 1 for first and 2 for 2nd).....\n");
@@ -213,25 +213,8 @@ int main( ){
 	player2.sign = 'X';
 
 	}
-	// ai = ( player1.type == AI )?player1:player2;
-	// human = ( player1.type == HUMAN )?player1:player2;
-	// setDepth();
-	// current = player1;
 	srand(time(NULL));
 	initializeBoard();
-	// printBoard();
-	// while ( !hasEnded() ){
-	// 	if ( current.type == AI ){
-	// 		cell = aiMove();
-	// 	} else {
-
-	// 		cell = getMove();
-	// 	}
-	// 	performMove(cell, current.position);	
-	// 	printBoard();
-	// 	turn++;
-	// 	current = ( current.position == PLAYER1 )?player2:player1;
-	// }
 	playGame(SINGLE);
 	return 0;
 }
@@ -308,7 +291,7 @@ aiBoard getRandomMove( aiBoard board[], player current){
 }
 
 int evaluateBoard( ){
-	short int row,col,i,j,wins = 0,values[8],sumRow=0,sumCol = 0,k=0;
+	short int i,j,wins = 0,values[8],sumRow=0,k=0;
 
 	for ( j = 0; j<7; j+= 3 ){
 		for ( i = 0; i<3; i++){
