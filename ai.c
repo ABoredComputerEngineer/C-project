@@ -122,7 +122,7 @@ int isLegal( int x  ){
 int getMove( void ){
 	char in[100];
 	while ( TRUE ){
-		scanf("%s",in);
+		getString(in);
 		if ( strlen(in) == 1 ){
 			if ( isLegal(ctoi(in[0])) )
 				return ctoi(in[0]);
@@ -141,6 +141,7 @@ int evaluateBoard(void);
 
 void playGame(int mode){
 	int winner;
+	initializeBoard();
 	printBoard();
 	if ( mode == SINGLE ){
 		winner = playSingle();
@@ -175,8 +176,10 @@ int playSingle( void ){
 }
 
 int playDouble( void ){
-	player current = player2;
+	player current = player1;
 	int cell,rv;
+		player1.position = PLAYER1;
+		player2.position = PLAYER2;
 	while ( !(rv=hasEnded()) ){
 		cell = getMove();
 		performMove(cell,current.position);
@@ -186,38 +189,38 @@ int playDouble( void ){
 	return rv;
 }
 
-int main( ){
-	// delay( 5 );
-	// int i, cell;
-	// player current;
-	char decision;
+// int main( ){
+// 	// delay( 5 );
+// 	// int i, cell;
+// 	// player current;
+// 	char decision;
 	
-	printf("\nFirst Move or Second Move? ( 1 for first and 2 for 2nd).....\n");
-	scanf("%c",&decision);
-	if ( decision == '1' ){
-		player1.type = HUMAN;
-		player1.position = PLAYER1;
-		player1.sign = '0';
+// 	printf("\nFirst Move or Second Move? ( 1 for first and 2 for 2nd).....\n");
+// 	scanf("%c",&decision);
+// 	if ( decision == '1' ){
+// 		player1.type = HUMAN;
+	
+// 		player1.sign = '0';
 
-		player2.type = AI;
-		player2.position = PLAYER2;
-		player2.sign = 'X';
+// 		player2.type = AI;
+// 		player2.position = PLAYER2;
+// 		player2.sign = 'X';
 
-	} else {
-		player1.type = AI;
-	player1.position = PLAYER1;
-	player1.sign = '0';
+// 	} else {
+// 		player1.type = AI;
+// 	player1.position = PLAYER1;
+// 	player1.sign = '0';
 
-	player2.type = HUMAN;
-	player2.position = PLAYER2;
-	player2.sign = 'X';
+// 	player2.type = HUMAN;
 
-	}
-	srand(time(NULL));
-	initializeBoard();
-	playGame(SINGLE);
-	return 0;
-}
+// 	player2.sign = 'X';
+
+// 	}
+// 	srand(time(NULL));
+// 	initializeBoard();
+// 	playGame(SINGLE);
+// 	return 0;
+// }
 
 
 
