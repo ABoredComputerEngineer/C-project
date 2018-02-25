@@ -3,25 +3,37 @@
 
 // Splits a string removing whitespaces and stores them in an array of strings
 int stringSplit(char [], char [][100] );
-
+/* Removes double quotes from a string*/
+void removeQuotes( char *);
+void getString( char * );
 // Matches a command and returns the index of the command in the command list
 
 command *matchCommand(char [][100]);
 
-// Matches a identifier in the idenfier list of the given command index
-identifier *matchIdentifier( command * , char [][100] );
+/* The parse Command reads the command typed by the user and perfoms the necessary action */
 void parseCommand(char [][100], int);
-option *parseSet(command *,char [][100], int);
-void parseNew(command *,char [][100], int);
-void parseView(command *,char [][100], int);
-void parseExit(command *,char [][100], int);
-void setOptions(option *);
-void applyDefault( void );
-void displaySettings( void );
 
-	command commandList[MAX_COMMANDS];
-	identifier identifierList[MAX_IDENTIFIERS];
-	option optionList[MAX_OPTIONS];
+/*Reads the commands if the user types "set" as the initial command */
+option *parseSet(command *,char [][100], int);
+
+/*Reads the commands if the user types "new" as the initial command */
+void parseNew(command *,char [][100], int);
+/*Reads the commands if the user types "view" as the initial command */
+void parseView(command *,char [][100], int);
+/*Reads the commands if the user types "exit" as the initial command */
+void parseExit(command *,char [][100], int);
+
+
+
+void setOptions(option *); // Changes the game settings according to the command of the user
+void applyDefault( void ); // Applies the default settings
+void applySettings( void );
+void displaySettings( void ); // Displays the game settings
+
+command commandList[MAX_COMMANDS]; // The list of valid commands
+identifier identifierList[MAX_IDENTIFIERS]; // The list of valid identifiers ( p1 ( player 1) , p2(player2) , ai  etc..)
+option optionList[MAX_OPTIONS]; // The list of options like name, sign etc.
+
 void buildCommandTree(){
 	int i = 0,j=0;
 	for ( i = 0; i<MAX_COMMANDS; i++ ){
@@ -84,16 +96,20 @@ int main(){
 	gameSet.difficulty = EASY;
 	char command[100];
 	char tokenList[10][100];
+	applyDefault();
 	while ( 1) {
 		putchar('>');
-		scanf("%[^\n]",command);
-		getchar();
+		// scanf("%[^\n]",command);
+		// gets(command);
+		getString(command);
+		// getchar();
 		k = stringSplit(command,tokenList);
 		// printf("tokens : %d\n",k);
 		
 		parseCommand(tokenList, k);
+		// getchar();
 		// printf("%d\n",gameSet.difficulty);
-		displaySettings();
+		// displaySettings();
 	}
 }
 
@@ -198,12 +214,12 @@ void setOptions(option *new ){
 
 
 void displaySettings( void ){
-		printf("\nPlayer 1::: \n");
-		NEWLINE;
-		printf("%-8s:::%20s\n","Name",gameSet.p1->name);
-		printf("%-8s:::%4c\n","Sign",gameSet.p1->sign);
+	printf("\nPlayer 1::: \n");
+	NEWLINE;
+	printf("%-8s:::%20s\n","Name",gameSet.p1->name);
+	printf("%-8s:::%4c\n","Sign",gameSet.p1->sign);
 	printf("\nPlayer 2::: \n");
-		NEWLINE;
+	NEWLINE;
 	printf("%-8s:::%20s\n","Name",gameSet.p2->name);
 	printf("%-8s:::%4c\n","Sign",gameSet.p2->sign);
 	printf("\nMarco Bot\n");
@@ -250,6 +266,7 @@ option *parseSet( command *current, char tokenList[][100] , int tokens ){
 			printf("\n%s \t %s \t %s \n",tokenList[OPTION],identify->optionList[i]->name,identify->name	);
 				if ( strcmp(identify->optionList[i]->name,tokenList[OPTION]) == 0 ){
 					opt = identify->optionList[i];
+					removeQuotes(tokenList[VALUE]);
 					strcpy(opt->identifierType,identify->name);
 
 					strcpy(opt->value,tokenList[VALUE]);
@@ -264,16 +281,19 @@ option *parseSet( command *current, char tokenList[][100] , int tokens ){
 }
 
 void parseNew(command *current, char tokenList[][100], int tokens ){
-	printf("\n%s\n",current->name);
+	printf("\n%s\n",current->name);	
 		if ( tokens > 2 ){
 			printf("Invalid number of arguments\n");
 			return;
 		}
 		if ( tokens == 1 ){
-			printf("\nStarting a new game \n");
+			playGame(SINGLE);
+			// printf("\nStarting a new game \n");
 		} else if ( strcmp(current->identifierList[0]->name, tokenList[IDENTIFIER]) == 0 ){
-			printf("\nStarting a single player game\n");
+			playGame(SINGLE);
+			// printf("\nStarting a single player game\n");
 		} else if ( strcmp(current->identifierList[1]->name, tokenList[IDENTIFIER]) == 0 ) {
+			playGame(DOUBLE);
 			printf("\nStarting two player game\n");
 		} else {
 			printf("Command  not recognized\n");
@@ -303,10 +323,31 @@ void parseView( command *current, char tokenList[][100], int tokens ){
 		if ( strcmp(identify->name, "score") == 0 ){
 			printf("\nDisplaying Score\n");
 		} else if ( strcmp(identify->name, "settings") == 0){
-			printf("\nDisplaying Settings\n");
+			// printf("\nDisplaying Settings\n");
+			displaySettings();
 		} else {
 			printf("Command not recognized\n");
 			return;
 		}
 
+}
+
+
+void removeQuotes( char str[] ){
+	char temp[100];
+	int i,j=0;
+	for ( i = 0; str[i] != '\0' ; i++ ){
+		if ( str[i] != '\"')
+			temp[j++] = str[i];
+	}
+	temp[j] = '\0';	
+	strcpy(str,temp);
+} 
+
+void getString(char x[]) {
+	char c;
+	int i = 0;
+	while ( (c=getchar()) != '\n' )
+		x[i++] = c;
+	x[i] = '\0';
 }
