@@ -64,6 +64,7 @@ int getMove( void );
 void playGame(int);
 int playSingle(void);
 int playDouble(void);
+void getString( char * );
 
 
 typedef struct command {
@@ -92,7 +93,7 @@ enum commands {set,new,view};
 
 /* Declaration of the Global Variables */
 game gameBoard;
-int turn = 1;
+// int turn = 1;
 short int maxDepth;
 player player1,player2,ai,human;
 settings gameSet;
