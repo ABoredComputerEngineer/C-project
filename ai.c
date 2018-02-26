@@ -16,10 +16,16 @@ aiBoard *newBoard( void ){
 /* Declarations and definitions of functions */
 
 void setDepth(){
-	if ( ai.position == PLAYER2 )
-		maxDepth = 4;
-	else 
-		maxDepth = 5;
+
+	if ( gameSet.difficulty == EASY || (gameSet.difficulty == MEDIUM  && (int)rand()%2)){
+		maxDepth = 2;
+	
+	} else {
+		if ( ai.position == PLAYER2 )
+			maxDepth = 4;
+		else 
+			maxDepth = 5;
+	}
 }
 /* ctoi converts the character to an integer if it is between 1  and 9*/
 int ctoi( char c ){
@@ -144,8 +150,20 @@ void playGame(int mode){
 	initializeBoard();
 	printBoard();
 	if ( mode == SINGLE ){
+
+		player1 = (gameStat.gcSingle%2)?gameSet.ai:gameSet.p1;
+		player2 = (gameStat.gcSingle%2)?gameSet.p1:gameSet.ai;
+		player1.position = PLAYER1;
+		player2.position = PLAYER2;
+
+		// player1 = gameSet.p1;
+		// player2 = gameSet.ai;
+		// player1.type = HUMAN;
+		// player2.type = AI;
 		winner = playSingle();
 	} else {
+		player1 = gameSet.p1;
+		player2 = gameSet.p2;
 		winner = playDouble();
 	}
 	if ( winner == PLAYER1 ){
@@ -158,12 +176,14 @@ void playGame(int mode){
 }
 
 int playSingle( void ){
-	player current = player1;
-	int cell;
-	ai = ( player1.type == AI )?player1:player2;
-	human = ( player1.type == HUMAN )?player1:player2;
+	player current;
+	current = player1;
+	ai = (player1.type == AI )?player1:player2;
+	human = (player1.type == HUMAN )?player1:player2;
+	int cell,rv;
 	setDepth();
-	while ( !hasEnded() ){
+	while ( !(rv=hasEnded()) ){
+		printf("%s\n",(current.type == AI)?"Ai turn":"Human turn");
 		if ( current.type == AI )
 			cell = aiMove();
 		else 
@@ -172,20 +192,25 @@ int playSingle( void ){
 		current = ( current.position == PLAYER1 )?player2:player1;		
 		printBoard();
 	}
-	return hasEnded();
+	gameStat.gcSingle++;
+	return rv;
 }
 
 int playDouble( void ){
-	player current = player1;
+	player current;
+
 	int cell,rv;
-		player1.position = PLAYER1;
-		player2.position = PLAYER2;
+
+	current = player1;
+
 	while ( !(rv=hasEnded()) ){
 		cell = getMove();
 		performMove(cell,current.position);
 		current = ( current.position == PLAYER1 )?player2:player1;
 		printBoard();
 	}
+
+	gameStat.gcDouble++;
 	return rv;
 }
 
