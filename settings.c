@@ -91,12 +91,13 @@ void buildCommandTree(){
 int main(){
 	int k;
 	buildCommandTree();
-	gameSet.p1 = &player1;
-	gameSet.p2 = &player2;
+	// gameSet.p1 = &player1;
+	// gameSet.p2 = &player2;
 	gameSet.difficulty = EASY;
 	char command[100];
 	char tokenList[10][100];
 	applyDefault();
+	gameStat.gcSingle = 0;
 	while ( 1) {
 		putchar('>');
 		// scanf("%[^\n]",command);
@@ -186,17 +187,17 @@ void setOptions(option *new ){
 
 	if ( strcmp(new->name,"name") == 0 ){
 		if ( strcmp(new->identifierType,"p1") == 0 ){
-			strcpy(player1.name,new->value);
+			strcpy(gameSet.p1.name,new->value);
 		} else if ( strcmp(new->identifierType,"p2") == 0) {
-			strcpy(player2.name,new->value);
+			strcpy(gameSet.p2.name,new->value);
 		} else {
 			strcpy(gameSet.ai.name,new->value);
 		}
 	} else if ( strcmp(new->name, "sign") == 0 ){
 		if ( strcmp(new->identifierType,"p1") == 0 ){
-			player1.sign = new->value[0];
+			gameSet.p1.sign = new->value[0];
 		} else {
-			player2.sign = new->value[0];
+			gameSet.p2.sign = new->value[0];
 		}
 	} else if ( strcmp(new->name, "mode") == 0 ){
 		if ( strcmp(new->value,"easy") == 0 ){
@@ -216,12 +217,12 @@ void setOptions(option *new ){
 void displaySettings( void ){
 	printf("\nPlayer 1::: \n");
 	NEWLINE;
-	printf("%-8s:::%20s\n","Name",gameSet.p1->name);
-	printf("%-8s:::%4c\n","Sign",gameSet.p1->sign);
+	printf("%-8s:::%20s\n","Name",gameSet.p1.name);
+	printf("%-8s:::%4c\n","Sign",gameSet.p1.sign);
 	printf("\nPlayer 2::: \n");
 	NEWLINE;
-	printf("%-8s:::%20s\n","Name",gameSet.p2->name);
-	printf("%-8s:::%4c\n","Sign",gameSet.p2->sign);
+	printf("%-8s:::%20s\n","Name",gameSet.p2.name);
+	printf("%-8s:::%4c\n","Sign",gameSet.p2.sign);
 	printf("\nMarco Bot\n");
 	NEWLINE;
 	printf("%-8s:::%20s\n","Name",gameSet.ai.name);
@@ -232,12 +233,18 @@ void displaySettings( void ){
 
 
 void applyDefault( void ){
-	strcpy(gameSet.p1->name,"Player 1");
-	gameSet.p1->sign = '0';
-	strcpy( gameSet.p2->name,"Player 2");
-	gameSet.p2->sign = 'X';
+	strcpy(gameSet.p1.name,"Player 1");
+	gameSet.p1.sign = '0';
+	gameSet.p1.position = PLAYER1;
+	gameSet.p1.type = HUMAN;
+	strcpy( gameSet.p2.name,"Player 2");
+	gameSet.p2.sign = 'X';
+	gameSet.p2.position = PLAYER2;
+	gameSet.p2.type = HUMAN;
 	strcpy(gameSet.ai.name,"Marco Bot");
 	gameSet.ai.sign = '+';
+	gameSet.ai.type = AI;
+	gameSet.ai.position = PLAYER2;
 	gameSet.difficulty = EASY;
 }
 
@@ -263,14 +270,14 @@ option *parseSet( command *current, char tokenList[][100] , int tokens ){
 		}
 
 		for ( i = 0; i<3 && identify->optionList[i] != NULL ; i++ ){
-			printf("\n%s \t %s \t %s \n",tokenList[OPTION],identify->optionList[i]->name,identify->name	);
+			// printf("\n%s \t %s \t %s \n",tokenList[OPTION],identify->optionList[i]->name,identify->name	);
 				if ( strcmp(identify->optionList[i]->name,tokenList[OPTION]) == 0 ){
 					opt = identify->optionList[i];
 					removeQuotes(tokenList[VALUE]);
 					strcpy(opt->identifierType,identify->name);
 
 					strcpy(opt->value,tokenList[VALUE]);
-					printf("Writing to options\n");
+					printf("Writing to options \t %s\n",opt->value);
 					// setOptions(opt);
 					return opt;
 				}
