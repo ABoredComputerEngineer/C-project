@@ -43,8 +43,8 @@ typedef struct player {
 } player;
 
 typedef struct settings {
-	player *p1;
-	player *p2;
+	player p1;
+	player p2;
 	player ai;
 	int difficulty;
 	int win;
@@ -86,6 +86,13 @@ typedef struct option{
 	// struct option *next;
 } option;
 
+typedef struct gs{
+	int p1Win;
+	int p2Win;
+	int aiWin;
+	int gcSingle;
+	int gcDouble;
+} stat;
 
 enum difficulty {EASY=1,MEDIUM,HARD};
 enum tokens {COMMAND,IDENTIFIER,OPTION,VALUE};
@@ -95,6 +102,6 @@ enum commands {set,new,view};
 game gameBoard;
 // int turn = 1;
 short int maxDepth;
-player player1,player2,ai,human;
+player player1,player2,ai,human,p1,p2;
 settings gameSet;
-
+stat gameStat;
