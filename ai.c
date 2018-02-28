@@ -167,9 +167,9 @@ void playGame(int mode){
 		winner = playDouble();
 	}
 	if ( winner == PLAYER1 ){
-		printf("Player 1 wins!!!\n");
+		printf("%s wins!!!\n",player1.name);
 	} else if (winner == PLAYER2) {
-		printf("Player 2 wins!!!\n");
+		printf("%s wins!!!\n",player2.name);
 	} else {
 		printf("The game has been drawn\n");
 	}
@@ -186,8 +186,10 @@ int playSingle( void ){
 		printf("%s\n",(current.type == AI)?"Ai turn":"Human turn");
 		if ( current.type == AI )
 			cell = aiMove();
-		else 
+		else {
+			printf("%s's turn: ", current.name);
 			cell = getMove();
+		}
 		performMove(cell, current.position);
 		current = ( current.position == PLAYER1 )?player2:player1;		
 		printBoard();
