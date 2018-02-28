@@ -196,8 +196,10 @@ void setOptions(option *new ){
 	} else if ( strcmp(new->name, "sign") == 0 ){
 		if ( strcmp(new->identifierType,"p1") == 0 ){
 			gameSet.p1.sign = new->value[0];
-		} else {
+		} else if ( strcmp(new->identifierType,"p2") == 0 ){
 			gameSet.p2.sign = new->value[0];
+		} else {
+			gameSet.ai.sign = new->value[0];
 		}
 	} else if ( strcmp(new->name, "mode") == 0 ){
 		if ( strcmp(new->value,"easy") == 0 ){
