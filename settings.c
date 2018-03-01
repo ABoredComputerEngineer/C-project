@@ -104,8 +104,9 @@ int main(){
 	gameSet.difficulty = EASY;
 	char command[100];
 	char tokenList[10][100];
-	applyDefault();
-	gameStat.gcSingle = 0;
+	readSettings();
+	// applyDefault();
+	// gameStat.gcSingle = 0;
 	srand(time(NULL));
 	while ( 1) {
 		putchar('>');
@@ -197,6 +198,7 @@ void setOptions(option *new ){
 			return;
 		}
 	}
+	writeSettings();
 }
 
 
