@@ -18,22 +18,18 @@
 #define DOUBLE 2
 
 #define MAX_OPTIONS 3
-#define MAX_IDENTIFIERS 7
+#define MAX_IDENTIFIERS 10
 #define MAX_COMMANDS 4
 #define IN 1
 #define OUT 0
 
 
-#define NEWLINE printf("---------------------------------------------\n")
+#define NEWLINE printf("------------------------------------------------------\n")
 typedef struct game {
 	char mat[BOARD_ROW][BOARD_COL];// The game board stored in matrix form
 	char row[BOARD]; //The game board stored in a single array
 } game; 
 
-typedef struct aiBoard {
-	int score;
-	int move;
-} aiBoard;
 
 typedef struct player {
 	char name[100];
@@ -52,11 +48,11 @@ typedef struct settings {
 } settings;
 
 
-aiBoard *newBoard( void );
-void setDepth( void );
+// aiBoard *newBoard( void );
+// void setDepth( void );
 int ctoi( char c );
 void initializeBoard(void);
-void printBoard( );
+void printBoard( void );
 int hasEnded( void );
 void performMove( int , int  );
 int isLegal( int x  );
@@ -65,10 +61,12 @@ void playGame(int);
 int playSingle(void);
 int playDouble(void);
 void getString( char * );
+void displayScore( void );
+// int aiMove(void);
 
 
 typedef struct command {
-	char name[10];
+	char name[6];
 	struct identifier *identifierList[3];
 } command;
 
@@ -86,13 +84,19 @@ typedef struct option{
 	// struct option *next;
 } option;
 
+typedef struct wl {
+	short int win;
+	short int lose;
+} score;
+
 typedef struct gs{
-	int p1Win;
-	int p2Win;
-	int aiWin;
+	score p1;
+	score p2;
+	score ai;
 	int gcSingle;
 	int gcDouble;
 } stat;
+
 
 enum difficulty {EASY=1,MEDIUM,HARD};
 enum tokens {COMMAND,IDENTIFIER,OPTION,VALUE};
