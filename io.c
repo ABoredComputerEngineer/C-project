@@ -1,67 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-
-#define BOARD 9
-#define BOARD_ROW 3
-#define BOARD_COL 3
-#define PLAYER1 0
-#define PLAYER2 1
-#define TRUE 1
-#define FALSE 0 
-
-void delay(double dly){
-    /* save start clock tick */
-    const clock_t start = clock();
-
-    clock_t current;
-    do{
-        /* get current clock tick */
-        current = clock();
-
-        /* break loop when the requested number of seconds have elapsed */
-    }while((double)(current-start)/CLOCKS_PER_SEC < dly);
-}
-
-
-typedef struct game {
-	char mat[BOARD_ROW][BOARD_COL];// The game board stored in matrix form
-	char row[BOARD]; //The game board stored in a single array
-} game; 
-
-/* Declaration of the Global Variables */
-game gameBoard;
-int turn = 1;
-
-
-typedef struct move {
-	int x;
-	int y;
-} move;
-
-/* Declarations and definitions of functions */
-
-
-/* ctoi converts the character to an integer if it is between 1  and 9*/
-int ctoi( char c ){
-	if ( c > '0' && c<='9' ) 
-		return c - '0' - 1 ;
-	else
-		return -1;
-}
-
-/* Initializes the board to the initial state by setting the entire board to empty*/
-void initializeBoard(void){
-	int i,j;
-	for ( i = 0; i<BOARD_ROW ; i++ )
-		for ( j = 0; j<BOARD_COL; j++ )
-			gameBoard.mat[i][j] = ' ';
-	for ( i = 0; i<BOARD; i++ )
-		gameBoard.row[i] = ' ';
-}
-
-
+#include "game.h"
+// #include "ai.h"
 /* prints the board according to the row type of the game board*/
 void printBoard( ){
 	printf("\t\t         |        |         \n");
@@ -77,56 +15,7 @@ void printBoard( ){
 	printf("\t\t    %c    |    %c   |    %c     \n",gameBoard.row[0],gameBoard.row[1],gameBoard.row[2]);
 	printf("\t\t         |        |         \n"); 
 	// printf("\t\t         |        |         \n");
-}
-
-
-/* Checks if the game has ended or not */
-
-int hasEnded( void ){
-	int i;
-	/*Checking if the game has ended in any of the row*/
-	for ( i = 0; i<7 ; i+= 3 ){
-		/*If one of cell of the row is empty , the game has not ended in that row*/
-		if (  gameBoard.row[i+1] == ' ')
-			break;
-		/* If all the values in the row are equal , The game has ended */
-		if ( gameBoard.row[i] == gameBoard.row[i+1] && gameBoard.row[i+1] == gameBoard.row[i+2] )
-			return TRUE;
-	}
-	/*Checking if the game has ended in any of the column*/
-	for ( i = 0; i<3 ; i++ ){
-		if ( gameBoard.row[i] == ' ' && gameBoard.row[i+3] == ' ' && gameBoard.row[i+6] == ' ')
-			break;
-		if ( gameBoard.row[i] == gameBoard.row[i+3] && gameBoard.row[i+3] == gameBoard.row[i+6] )
-			return TRUE;
-	}
-	/*Checking if the game has ended in any of the diagonals*/
-	if ( gameBoard.row[4] != ' '){
-
-		if ( gameBoard.row[0] == gameBoard.row[4] && gameBoard.row[4] == gameBoard.row[8] )
-			return TRUE;
-		if ( gameBoard.row[2] == gameBoard.row[4] && gameBoard.row[4] == gameBoard.row[6] )
-			return TRUE;
-	}
-	/*If it has not ended */
-	return FALSE;
-}
-
-void performMove( int x , int player ){
-	/* Changes the value in the game board accoriding to the player, player 1 is 0 
-	and player 2 is + */
-	gameBoard.row[x] = ( player == PLAYER1 )?'0':'+';;
-
-}
-
-
-/* Checks if the move the user is trying to do is legal or not */
-int isLegal( int x  ){
-	/* If the character is not valid or the cell the user is trying to fill is not Empty*/
-	if ( x == -1 || gameBoard.row[x] != ' ')
-		return FALSE;
-	else 
-		return TRUE; 
+	putchar('\n');
 }
 
 /* Gets the move the user wants to perform in the form of a string and returns the value of the cell
@@ -135,38 +24,99 @@ int isLegal( int x  ){
 int getMove( void ){
 	char in[100];
 	while ( TRUE ){
-		scanf("%s",in);
+		getString(in);
 		if ( strlen(in) == 1 ){
 			if ( isLegal(ctoi(in[0])) )
 				return ctoi(in[0]);
-		//	else 
-		//		printf("\nInvalid Move\n");
-		}// else {
-		//	printf("\nInvalid Move\n");
-		//}
+		}
 	printf("\nInvalid Move\n");
 	}
 	
 }
 
+/* ctoi converts the character to an integer if it is between 1  and 9*/
+int ctoi( char c ){
+	if ( c > '0' && c<='9' ) 
+		return c - '0' - 1 ;
+	else
+		return -1;
+}
 
-int main( ){
-	// delay( 5 );
-	int player = PLAYER1, cell;
-	// move newMove;
-	initializeBoard();
-	printBoard();
-
-	while ( !hasEnded() ){
-		cell = getMove();
-		// newMove.x = (cell - 1 ) % 3;
-		// newMove.y = (cell - 1 )/3;
-		performMove(cell, player);	
-		printBoard();
-		turn++;
-		player = !player;
+void removeQuotes( char str[] ){
+	char temp[100];
+	int i,j=0;
+	for ( i = 0; str[i] != '\0' ; i++ ){
+		if ( str[i] != '\"')
+			temp[j++] = str[i];
 	}
+	temp[j] = '\0';	
+	strcpy(str,temp);
+} 
 
-	printf("You won\n");
-	return 0;
+void getString(char x[]) {
+	char c;
+	int i = 0;
+	while ( (c=getchar()) != '\n' )
+		x[i++] = c;
+	x[i] = '\0';
+}
+
+void displaySettings( void ){
+		NEWLINE;
+	printf("Player 1 | \n");
+	NEWLINE;
+	printf("%-12s:::\t%-10s\n","Name",gameSet.p1.name);
+	printf("%-12s:::\t%-4c\n","Sign",gameSet.p1.sign);
+		NEWLINE;
+	printf("Player 2 | \n");
+	NEWLINE;
+	printf("%-12s:::\t%-10s\n","Name",gameSet.p2.name);
+	printf("%-12s:::\t%-4c\n","Sign",gameSet.p2.sign);
+		NEWLINE;
+	printf("Computer |\n");
+	NEWLINE;
+	printf("%-12s:::\t%-10s\n","Name",gameSet.ai.name);
+	printf("%-12s:::\t%-4c\n","Sign",gameSet.ai.sign);
+	printf("%-12s:::\t%-6s\n","Difficulty",(gameSet.difficulty == EASY )?"Easy":((gameSet.difficulty == MEDIUM)?"Medium":"Hard"));
+	
+}
+
+
+int stringSplit( char in[], char out[][100]){
+	int i,quote = OUT,k = 0,state = OUT,wordCount = 0;
+
+	for ( i = 0; in[i] != '\0'; i++ ){
+		if ( in[i] == ' ' && quote == OUT){
+			out[wordCount - 1][k] = '\0';
+
+			state = OUT;
+		} else if (state == OUT) {
+			wordCount++;
+			k = 0;
+			state = IN;
+
+		}
+
+		if ( in[i] == '\"')
+			quote = !quote;
+
+		if ( state == IN ){
+			out[wordCount-1][k++] = in[i];
+		}
+
+	}
+	out[wordCount-1][k] = '\0';
+	return wordCount ;
+}
+
+void displayScore( void ){
+	NEWLINE;
+	printf("%-20s\tWin:%-4d\tLoss:%-4d\n","Player 1",gameStat.p1.win,gameStat.p1.lose);
+	NEWLINE;
+	// NEWLINE;
+	printf("%-20s\tWin:%-4d\tLoss:%-4d\n","Player 2",gameStat.p2.win,gameStat.p2.lose);
+	NEWLINE;
+		// NEWLINE;
+	printf("%-20s\tWin:%-4d\tLoss:%-4d\n","Computer",gameStat.ai.win,gameStat.ai.lose);
+	NEWLINE;
 }
