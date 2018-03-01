@@ -1,5 +1,6 @@
 
 #include "game.h"
+#include "ai.h"
 
 aiBoard *newBoard( void ){
 	int i;
@@ -27,194 +28,18 @@ void setDepth(){
 			maxDepth = 5;
 	}
 }
-/* ctoi converts the character to an integer if it is between 1  and 9*/
-int ctoi( char c ){
-	if ( c > '0' && c<='9' ) 
-		return c - '0' - 1 ;
-	else
-		return -1;
-}
-
-/* Initializes the board to the initial state by setting the entire board to empty*/
-void initializeBoard(void){
-	int i,j;
-	for ( i = 0; i<BOARD_ROW ; i++ )
-		for ( j = 0; j<BOARD_COL; j++ )
-			gameBoard.mat[i][j] = ' ';
-	for ( i = 0; i<BOARD; i++ )
-		gameBoard.row[i] = ' ';
-}
 
 
-/* prints the board according to the row type of the game board*/
-void printBoard( ){
-	printf("\t\t         |        |         \n");
-	printf("\t\t    %c    |    %c   |    %c     \n",gameBoard.row[6],gameBoard.row[7],gameBoard.row[8]);
-	printf("\t\t         |        |         \n");
-	printf("\t\t---------|--------|---------\n");
-	//printf("\t\t         |        |         \n");
-	printf("\t\t         |        |         \n");
-	printf("\t\t    %c    |    %c   |    %c     \n",gameBoard.row[3],gameBoard.row[4],gameBoard.row[5]);
-	printf("\t\t         |        |         \n");
-	printf("\t\t---------|--------|---------\n"); 	
-	printf("\t\t         |        |         \n");
-	printf("\t\t    %c    |    %c   |    %c     \n",gameBoard.row[0],gameBoard.row[1],gameBoard.row[2]);
-	printf("\t\t         |        |         \n"); 
-	// printf("\t\t         |        |         \n");
-	putchar('\n');
-}
 
 
-/* Checks if the game has ended or not */
 
-int hasEnded( void ){
-	int i;
-	/*Checking if the game has ended in any of the row*/
-	for ( i = 0; i<7 ; i+= 3 ){
-		/*If one of cell of the row is empty , the game has not ended in that row*/
-		if (  gameBoard.row[i+1] == ' ')
-			continue;
-		/* If all the values in the row are equal , The game has ended */
-		if ( gameBoard.row[i] == gameBoard.row[i+1] && gameBoard.row[i+1] == gameBoard.row[i+2] ){
-			return (gameBoard.row[i+1] == player1.sign)?PLAYER1:PLAYER2;
-		}
-	}
-	/*Checking if the game has ended in any of the column*/
-	for ( i = 0; i<3 ; i++ ){
-		if ( gameBoard.row[i+3] == ' ')
-			continue;
-		if ( gameBoard.row[i] == gameBoard.row[i+3] && gameBoard.row[i+3] == gameBoard.row[i+6] )
-			return (gameBoard.row[i+3] == player1.sign)?PLAYER1:PLAYER2;
-	}
-	/*Checking if the game has ended in any of the diagonals*/
-	if ( gameBoard.row[4] != ' '){
-
-		if ( gameBoard.row[0] == gameBoard.row[4] && gameBoard.row[4] == gameBoard.row[8] )
-			return (gameBoard.row[4] == player1.sign)?PLAYER1:PLAYER2;
-		if ( gameBoard.row[2] == gameBoard.row[4] && gameBoard.row[4] == gameBoard.row[6] )
-			return (gameBoard.row[4] == player1.sign)?PLAYER1:PLAYER2;
-	}
-
-	for ( i =0 ; i<9; i++ ){
-		if ( gameBoard.row[i] == ' ')
-			return FALSE;
-	}
-	return TIE;
-	/*If it has not ended */
-	// return FALSE;
-}
-
-void performMove( int x , int player ){
-	/* Changes the value in the game board accoriding to the player, player 1 is 0 
-	and player 2 is + */
-
-	gameBoard.row[x] = ( player == PLAYER1 )?player1.sign:player2.sign;
-
-}
-
-
-/* Checks if the move the user is trying to do is legal or not */
-int isLegal( int x  ){
-	/* If the character is not valid or the cell the user is trying to fill is not Empty*/
-	if ( x == -1 || gameBoard.row[x] != ' ')
-		return FALSE;
-	else 
-		return TRUE; 
-}
-
-/* Gets the move the user wants to perform in the form of a string and returns the value of the cell
-	in the board */
-
-int getMove( void ){
-	char in[100];
-	while ( TRUE ){
-		getString(in);
-		if ( strlen(in) == 1 ){
-			if ( isLegal(ctoi(in[0])) )
-				return ctoi(in[0]);
-		}
-	printf("\nInvalid Move\n");
-	}
-	
-}
-aiBoard getBestMove( player current, int depth );
-int aiMove(  ){
+int aiMove( void ){
 	return getBestMove(ai , 0).move;
 }
 
-aiBoard getRandomMove( aiBoard *board, player current );
-int evaluateBoard(void);
 
-void playGame(int mode){
-	int winner;
-	initializeBoard();
-	printBoard();
-	if ( mode == SINGLE ){
 
-		player1 = (gameStat.gcSingle%2)?gameSet.ai:gameSet.p1;
-		player2 = (gameStat.gcSingle%2)?gameSet.p1:gameSet.ai;
-		player1.position = PLAYER1;
-		player2.position = PLAYER2;
 
-		// player1 = gameSet.p1;
-		// player2 = gameSet.ai;
-		// player1.type = HUMAN;
-		// player2.type = AI;
-		winner = playSingle();
-	} else {
-		player1 = gameSet.p1;
-		player2 = gameSet.p2;
-		winner = playDouble();
-	}
-	if ( winner == PLAYER1 ){
-		printf("%s wins!!!\n",player1.name);
-	} else if (winner == PLAYER2) {
-		printf("%s wins!!!\n",player2.name);
-	} else {
-		printf("The game has been drawn\n");
-	}
-}
-
-int playSingle( void ){
-	player current;
-	current = player1;
-	ai = (player1.type == AI )?player1:player2;
-	human = (player1.type == HUMAN )?player1:player2;
-	int cell,rv;
-	setDepth();
-	while ( !(rv=hasEnded()) ){
-		printf("%s\n",(current.type == AI)?"Ai turn":"Human turn");
-		if ( current.type == AI )
-			cell = aiMove();
-		else {
-			printf("%s's turn: ", current.name);
-			cell = getMove();
-		}
-		performMove(cell, current.position);
-		current = ( current.position == PLAYER1 )?player2:player1;		
-		printBoard();
-	}
-	gameStat.gcSingle++;
-	return rv;
-}
-
-int playDouble( void ){
-	player current;
-
-	int cell,rv;
-
-	current = player1;
-
-	while ( !(rv=hasEnded()) ){
-		cell = getMove();
-		performMove(cell,current.position);
-		current = ( current.position == PLAYER1 )?player2:player1;
-		printBoard();
-	}
-
-	gameStat.gcDouble++;
-	return rv;
-}
 
 // int main( ){
 // 	// delay( 5 );
