@@ -62,8 +62,12 @@ int playSingle(void);
 int playDouble(void);
 void getString( char * );
 void displayScore( void );
+void applyDefault(void);
 // int aiMove(void);
-
+void newSettings(void);
+void writeSettings(void);
+void readSettings(void);
+void newSettings(void);
 
 typedef struct command {
 	char name[6];
