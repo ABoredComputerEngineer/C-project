@@ -1,5 +1,5 @@
 #include "game.h"
-
+#include "ai.h"
 
 // Splits a string removing whitespaces and stores them in an array of strings
 int stringSplit(char [], char [][100] );
@@ -49,6 +49,7 @@ void buildCommandTree(){
 	strcpy(commandList[1].name , "new");
 	strcpy(commandList[2].name ,"view");
 	strcpy(commandList[3].name , "exit");
+	// printf("current command: %s\n",commandList[3].name);
 
 	commandList[0].identifierList[0] = &identifierList[0]; // identiferList[0] is player 1
 	commandList[0].identifierList[1] = &identifierList[1]; // identifierList[1] is player 2
@@ -78,8 +79,13 @@ void buildCommandTree(){
 
 	commandList[2].identifierList[0] = &identifierList[5]; // Settings
 	commandList[2].identifierList[1] = &identifierList[6]; //Score
+	commandList[2].identifierList[2] = &identifierList[7];
+	commandList[2].identifierList[3] = &identifierList[8];
 	strcpy(identifierList[5].name , "settings");
 	strcpy(identifierList[6].name , "score");
+	strcpy(identifierList[7].name , "credits");
+	strcpy(identifierList[8].name , "help");
+
 
 	strcpy(optionList[0].name , "name" );
 	strcpy(optionList[1].name , "sign");
@@ -91,6 +97,8 @@ void buildCommandTree(){
 int main(){
 	int k;
 	buildCommandTree();
+		strcpy(commandList[3].name , "exit");
+	// printf("current command: %s\n",commandList[3].name);
 	// gameSet.p1 = &player1;
 	// gameSet.p2 = &player2;
 	gameSet.difficulty = EASY;
@@ -98,6 +106,7 @@ int main(){
 	char tokenList[10][100];
 	applyDefault();
 	gameStat.gcSingle = 0;
+	srand(time(NULL));
 	while ( 1) {
 		putchar('>');
 		// scanf("%[^\n]",command);
@@ -117,7 +126,8 @@ int main(){
 
 command *matchCommand( char tokenList[][100] ){
 	int i =0;
-	for ( i = 0; i<MAX_COMMANDS; i++ ){
+	for ( i = 0; i<MAX_COMMANDS ; i++ ){
+		// printf("%s\t%s\n",tokenList[COMMAND],commandList[i].name);
 		if ( strcmp(tokenList[COMMAND],commandList[i].name) == 0 )
 			return &commandList[i];
 	}
@@ -131,6 +141,7 @@ void parseCommand(char tokenList[][100], int tokens){ // tokens is the number of
 	// identifier *identify = NULL;
 	option *opt = NULL;
 	current = matchCommand(tokenList);
+	// printf("\n%s\n",tokenList[0]);
 
 	if ( current == NULL ){
 		return;
@@ -145,6 +156,7 @@ void parseCommand(char tokenList[][100], int tokens){ // tokens is the number of
 		parseView(current,tokenList,tokens);
 
 	} else if ( strcmp(current->name,"exit") == 0){
+		printf("Exiting\n");
 		exit(1);
 	} else {
 		printf("Invaid command\n");
@@ -153,34 +165,6 @@ void parseCommand(char tokenList[][100], int tokens){ // tokens is the number of
 
 }
 
-
-
-int stringSplit( char in[], char out[][100]){
-	int i,quote = OUT,k = 0,state = OUT,wordCount = 0;
-
-	for ( i = 0; in[i] != '\0'; i++ ){
-		if ( in[i] == ' ' && quote == OUT){
-			out[wordCount - 1][k] = '\0';
-
-			state = OUT;
-		} else if (state == OUT) {
-			wordCount++;
-			k = 0;
-			state = IN;
-
-		}
-
-		if ( in[i] == '\"')
-			quote = !quote;
-
-		if ( state == IN ){
-			out[wordCount-1][k++] = in[i];
-		}
-
-	}
-	out[wordCount-1][k] = '\0';
-	return wordCount ;
-}
 
 
 void setOptions(option *new ){
@@ -216,22 +200,6 @@ void setOptions(option *new ){
 }
 
 
-void displaySettings( void ){
-	printf("\nPlayer 1::: \n");
-	NEWLINE;
-	printf("%-8s:::%20s\n","Name",gameSet.p1.name);
-	printf("%-8s:::%4c\n","Sign",gameSet.p1.sign);
-	printf("\nPlayer 2::: \n");
-	NEWLINE;
-	printf("%-8s:::%20s\n","Name",gameSet.p2.name);
-	printf("%-8s:::%4c\n","Sign",gameSet.p2.sign);
-	printf("\nMarco Bot\n");
-	NEWLINE;
-	printf("%-8s:::%20s\n","Name",gameSet.ai.name);
-	printf("%-8s:::%4c\n","Name",gameSet.ai.sign);
-	printf("%-8s:::%6s\n","Name",(gameSet.difficulty == EASY )?"Easy":((gameSet.difficulty == MEDIUM)?"Medium":"Hard"));
-	
-}
 
 
 void applyDefault( void ){
@@ -319,7 +287,7 @@ void parseView( command *current, char tokenList[][100], int tokens ){
 			printf("Invalid number of arguments\n");
 			return;
 		}
-		for ( i = 0; i<3 && current->identifierList[i] != NULL ; i++ ){
+		for ( i = 0; i<MAX_IDENTIFIERS && current->identifierList[i] != NULL ; i++ ){
 			if ( strcmp(current->identifierList[i]->name, tokenList[IDENTIFIER]) == 0 ){
 				identify = current->identifierList[i];
 				break;
@@ -331,9 +299,14 @@ void parseView( command *current, char tokenList[][100], int tokens ){
 		}
 		if ( strcmp(identify->name, "score") == 0 ){
 			printf("\nDisplaying Score\n");
+			displayScore();
 		} else if ( strcmp(identify->name, "settings") == 0){
 			// printf("\nDisplaying Settings\n");
 			displaySettings();
+		} else if ( strcmp(identify->name, "help") == 0 ){
+			printf("Printing Help\n");
+		} else if ( strcmp(identify->name, "credits") == 0 ){
+			printf("Printing Credits\n");
 		} else {
 			printf("Command not recognized\n");
 			return;
@@ -342,21 +315,3 @@ void parseView( command *current, char tokenList[][100], int tokens ){
 }
 
 
-void removeQuotes( char str[] ){
-	char temp[100];
-	int i,j=0;
-	for ( i = 0; str[i] != '\0' ; i++ ){
-		if ( str[i] != '\"')
-			temp[j++] = str[i];
-	}
-	temp[j] = '\0';	
-	strcpy(str,temp);
-} 
-
-void getString(char x[]) {
-	char c;
-	int i = 0;
-	while ( (c=getchar()) != '\n' )
-		x[i++] = c;
-	x[i] = '\0';
-}
