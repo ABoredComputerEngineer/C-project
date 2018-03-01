@@ -114,6 +114,7 @@ void playGame(int mode){
 	} else {
 		printf("The game has been drawn\n");
 	}
+	writeSettings();
 }
 
 int playSingle( void ){
