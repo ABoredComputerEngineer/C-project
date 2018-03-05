@@ -30,6 +30,7 @@ int getMove( void ){
 				return ctoi(in[0]);
 		}
 	printf("\nInvalid Move\n");
+	putchar('>');
 	}
 	
 }
