@@ -1,7 +1,13 @@
 #include "game.h"
+#include "settings.h"
+extern settings gameSet;
+extern stat gameStat;
+
 // #include "ai.h"
 /* prints the board according to the row type of the game board*/
+void displayHeading(char *);
 void printBoard( ){
+	NEWSCREEN;
 	printf("\t\t         |        |         \n");
 	printf("\t\t    %c    |    %c   |    %c     \n",gameBoard.row[6],gameBoard.row[7],gameBoard.row[8]);
 	printf("\t\t         |        |         \n");
@@ -63,23 +69,28 @@ void getString(char x[]) {
 }
 
 void displaySettings( void ){
-		NEWLINE;
-	printf("Player 1 | \n");
+	// NEWSCREEN;	
+	// NEWLINE;
+	// printf("%20s|  %s  |\n"," ","Settings");
+	// 	NEWLINE;
+	displayHeading("Settings");
+	printf("| Player 1 | \n");
 	NEWLINE;
 	printf("%-12s:::\t%-10s\n","Name",gameSet.p1.name);
 	printf("%-12s:::\t%-4c\n","Sign",gameSet.p1.sign);
 		NEWLINE;
-	printf("Player 2 | \n");
+	printf("| Player 2 | \n");
 	NEWLINE;
 	printf("%-12s:::\t%-10s\n","Name",gameSet.p2.name);
 	printf("%-12s:::\t%-4c\n","Sign",gameSet.p2.sign);
 		NEWLINE;
-	printf("Computer |\n");
+	printf("| Computer |\n");
 	NEWLINE;
 	printf("%-12s:::\t%-10s\n","Name",gameSet.ai.name);
 	printf("%-12s:::\t%-4c\n","Sign",gameSet.ai.sign);
 	printf("%-12s:::\t%-6s\n","Difficulty",(gameSet.difficulty == EASY )?"Easy":((gameSet.difficulty == MEDIUM)?"Medium":"Hard"));
-	
+	NEWLINE;
+	printf("\n\n");
 }
 
 
@@ -111,7 +122,8 @@ int stringSplit( char in[], char out[][100]){
 }
 
 void displayScore( void ){
-	NEWLINE;
+	displayHeading("ScoreCard");
+	// NEWLINE;
 	printf("%-20s\tWin:%-4d\tLoss:%-4d\n","Player 1",gameStat.p1.win,gameStat.p1.lose);
 	NEWLINE;
 	// NEWLINE;
@@ -119,5 +131,14 @@ void displayScore( void ){
 	NEWLINE;
 		// NEWLINE;
 	printf("%-20s\tWin:%-4d\tLoss:%-4d\n","Computer",gameStat.ai.win,gameStat.ai.lose);
+	// NEWLINE;
+		NEWLINE;
+	printf("\n\n");
+}
+
+void displayHeading ( char *s ){
+		NEWSCREEN;	
 	NEWLINE;
+	printf("%20s|  %s  |\n"," ",s);
+		NEWLINE;
 }

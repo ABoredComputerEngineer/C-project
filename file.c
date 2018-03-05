@@ -1,5 +1,9 @@
 #include "game.h"
-#include <assert.h>
+// #include <assert.h>
+#include "settings.h"
+extern settings gameSet;
+extern stat gameStat;
+
 // settings newSet;
 typedef struct {
 	settings set;

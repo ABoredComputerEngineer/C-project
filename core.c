@@ -1,5 +1,9 @@
 #include "game.h"
 #include "ai.h"
+#include "settings.h"
+extern settings gameSet;
+extern stat gameStat;
+
 /* Initializes the board to the initial state by setting the entire board to empty*/
 void initializeBoard(void){
 	int i,j;

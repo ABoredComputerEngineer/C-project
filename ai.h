@@ -1,4 +1,5 @@
 // #include "game.h"
+// #include "settings.h"
 
 typedef struct aiBoard {
 	int score;

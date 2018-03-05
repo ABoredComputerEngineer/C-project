@@ -18,13 +18,14 @@
 #define DOUBLE 2
 
 #define MAX_OPTIONS 3
-#define MAX_IDENTIFIERS 10
-#define MAX_COMMANDS 4
+#define MAX_IDENTIFIERS 11
+#define MAX_COMMANDS 20
 #define IN 1
 #define OUT 0
 
 
 #define NEWLINE printf("------------------------------------------------------\n")
+#define NEWSCREEN printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
 typedef struct game {
 	char mat[BOARD_ROW][BOARD_COL];// The game board stored in matrix form
 	char row[BOARD]; //The game board stored in a single array
@@ -38,14 +39,6 @@ typedef struct player {
 	char sign;
 } player;
 
-typedef struct settings {
-	player p1;
-	player p2;
-	player ai;
-	int difficulty;
-	int win;
-	int loss;
-} settings;
 
 
 // aiBoard *newBoard( void );
@@ -69,47 +62,9 @@ void writeSettings(void);
 void readSettings(void);
 void newSettings(void);
 
-typedef struct command {
-	char name[6];
-	struct identifier *identifierList[3];
-} command;
-
-
-typedef struct identifier {
-	char name[15];
-	struct option *optionList[4];
-} identifier;
-
-
-typedef struct option{
-	char name[50];
-	char identifierType[15];
-	char value[100];
-	// struct option *next;
-} option;
-
-typedef struct wl {
-	short int win;
-	short int lose;
-} score;
-
-typedef struct gs{
-	score p1;
-	score p2;
-	score ai;
-	int gcSingle;
-	int gcDouble;
-} stat;
-
-
-enum difficulty {EASY=1,MEDIUM,HARD};
-enum tokens {COMMAND,IDENTIFIER,OPTION,VALUE};
-enum commands {set,new,view};
 
 /* Declaration of the Global Variables */
 game gameBoard;
 // int turn = 1;
 short int maxDepth;
 player player1,player2,ai,human,p1,p2;
-settings gameSet;
-stat gameStat;

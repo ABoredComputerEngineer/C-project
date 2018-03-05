@@ -1,6 +1,10 @@
 
 #include "game.h"
 #include "ai.h"
+#include "settings.h"
+
+extern settings gameSet;
+extern stat gameStat;
 
 aiBoard *newBoard( void ){
 	int i;
@@ -47,7 +51,7 @@ int aiMove( void ){
 // 	// player current;
 // 	char decision;
 	
-// 	printf("\nFirst Move or Second Move? ( 1 for first and 2 for 2nd).....\n");
+// 	//printf("\nFirst Move or Second Move? ( 1 for first and 2 for 2nd).....\n");
 // 	scanf("%c",&decision);
 // 	if ( decision == '1' ){
 // 		player1.type = HUMAN;
@@ -91,7 +95,7 @@ aiBoard getBestMove( player current , int depth ){
 	for ( i = 0; i<9 ; i++ ){
 		if ( gameBoard.row[i] == ' ' ){
 			performMove( i , current.position );
-			printBoard();
+			//printBoard();
 			// depth++;
 			if ( current.type == AI )
 				score = getBestMove( human, depth + 1 ).score;
@@ -104,9 +108,9 @@ aiBoard getBestMove( player current , int depth ){
 
 	}
 
-	for ( i = 0; new[i].score!=GARBAGE &&i<9; i++ )
-		printf("Score: %d\tMove:%d\t%s\n",new[i].score,new[i].move,(current.type==AI)?"AI":"Human");
-	putchar('\n');
+	// for ( i = 0; new[i].score!=GARBAGE &&i<9; i++ )
+		//printf("Score: %d\tMove:%d\t%s\n",new[i].score,new[i].move,(current.type==AI)?"AI":"Human");
+	// putchar('\n');
 
 
 	move = getRandomMove( new, current );
