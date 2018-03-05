@@ -576,7 +576,7 @@ void playGame(int mode){
 	} else {
 		printf("The game has been drawn\n");
 	}
-	writeSettings();
+	// writeSettings();
 }
 
 int playSingle( void ){
@@ -848,8 +848,8 @@ int main(){
 	gameSet.difficulty = EASY;
 	char command[100];
 	char tokenList[10][100];
-	readSettings();
-	// applyDefault();
+	// readSettings();
+	applyDefault();
 	// gameStat.gcSingle = 0;
 	srand(time(NULL));
 	while ( 1) {
@@ -942,7 +942,7 @@ void setOptions(option *new ){
 			return;
 		}
 	}
-	writeSettings();
+	// writeSettings();
 }
 
 
