@@ -148,6 +148,7 @@ int playDouble( void ){
 	current = player1;
 
 	while ( !(rv=hasEnded()) ){
+		printf("%s's turn: ",current.name);
 		cell = getMove();
 		performMove(cell,current.position);
 		current = ( current.position == PLAYER1 )?player2:player1;
