@@ -63,6 +63,13 @@ void readSettings(void);
 void newSettings(void);
 
 
+
+enum errors {err_command,err_identifier,err_move};
+void displayError(enum errors , char *);
+void displayViewHelp(void);
+void displaySetHelp(void);
+void displayNewHelp(void);
+
 /* Declaration of the Global Variables */
 game gameBoard;
 // int turn = 1;

@@ -99,8 +99,12 @@ void playGame(int mode){
 				gameStat.ai.lose++;
 		}
 	} else {
-		player1 = gameSet.p1;
-		player2 = gameSet.p2;
+		// player1 = gameSet.p1;
+		// player2 = gameSet.p2;
+		player1 = (gameStat.gcDouble%2)?gameSet.p2:gameSet.p1;
+		player2 = (gameStat.gcDouble%2)?gameSet.p1:gameSet.p2;
+		player1.position = PLAYER1;
+		player2.position = PLAYER2;
 		winner = playDouble();
 		if ( winner == PLAYER1 ){
 			gameStat.p1.win++;

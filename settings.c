@@ -140,6 +140,7 @@ void parseCommand(char tokenList[][100], int tokens){ // tokens is the number of
 	// //printf("\n%s\n",tokenList[0]);
 
 	if ( current == NULL ){
+		displayError(err_command,"n");
 		return;
 	} else if ( strcmp(current->name,"set") == 0 ){  // If the command is to change the settings
 		opt  = parseSet(current,tokenList,tokens);
@@ -155,6 +156,7 @@ void parseCommand(char tokenList[][100], int tokens){ // tokens is the number of
 		//printf("Exiting\n");
 		exit(1);
 	} else {
+		displayError(err_command,"n");
 		//printf("Invaid command\n");
 	}
 	return;
@@ -221,18 +223,19 @@ option *parseSet( command *current, char tokenList[][100] , int tokens ){
 	identifier *identify = NULL;
 	option *opt = NULL;
 	//printf("\n%s\n",current->name);
-		if ( tokens != 4 ){
-			//printf("\nInvalid arguments\n");
-			return NULL;
-		}
+		// if ( tokens != 4 ){
+		// 	//printf("\nInvalid arguments\n");
+		// 	return NULL;
+		// }
 		for ( i = 0; i<3 && current->identifierList[i] != NULL ; i++ ){
 			if ( strcmp(current->identifierList[i]->name, tokenList[IDENTIFIER]) == 0 ){
 				identify = current->identifierList[i];
 				break;
 			}
 		} 
-		if (identify == NULL ) {
+		if (identify == NULL || tokens < 4 ) {
 			//printf("identifier Not found\n");
+			displayError(err_identifier,current->name);
 			return NULL;
 		}
 
@@ -257,6 +260,7 @@ option *parseSet( command *current, char tokenList[][100] , int tokens ){
 void parseNew(command *current, char tokenList[][100], int tokens ){
 	//printf("\n%s\n",current->name);	
 		if ( tokens > 2 ){
+			displayError(err_identifier,current->name);
 			//printf("Invalid number of arguments\n");
 			return;
 		}
@@ -271,6 +275,7 @@ void parseNew(command *current, char tokenList[][100], int tokens ){
 			//printf("\nStarting two player game\n");
 		} else {
 			//printf("Command  not recognized\n");
+			displayError(err_identifier,current->name);
 			return;
 		}
 
@@ -281,7 +286,8 @@ void parseView( command *current, char tokenList[][100], int tokens ){
 	int i;
 	// printf("\n%s\n",current->name);
 		if  (tokens != 2  ){
-			printf("Invalid number of arguments\n");
+			// printf("Invalid number of arguments\n");
+			displayError(err_identifier,current->name);
 			return;
 		}
 		for ( i = 0; i<MAX_IDENTIFIERS && current->identifierList[i] != NULL ; i++ ){
@@ -292,7 +298,8 @@ void parseView( command *current, char tokenList[][100], int tokens ){
 			}
 		} 
 		if ( identify == NULL ){
-			printf("\nInvlaid Command\n");
+			// printf("\nInvlaid Command\n");
+			displayError(err_identifier,current->name);
 			return;
 		}
 		if ( strcmp(identify->name, "score") == 0 ){
@@ -306,7 +313,8 @@ void parseView( command *current, char tokenList[][100], int tokens ){
 		} else if ( strcmp(identify->name, "credits") == 0 ){
 			printf("Printing Credits\n");
 		} else {
-			printf("Command not recognized\n");
+			// printf("Command not recognized\n");
+			displayError(err_identifier,current->name);
 			return;
 		}
 

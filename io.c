@@ -7,7 +7,7 @@ extern stat gameStat;
 /* prints the board according to the row type of the game board*/
 void displayHeading(char *);
 void printBoard( ){
-	NEWSCREEN;
+	// NEWSCREEN;
 	printf("\t\t         |        |         \n");
 	printf("\t\t    %c    |    %c   |    %c     \n",gameBoard.row[6],gameBoard.row[7],gameBoard.row[8]);
 	printf("\t\t         |        |         \n");
