@@ -4,9 +4,9 @@
 #include <time.h>
 
 #if defined(_WIN32)
-    #define PATH "%userprofile%\documents"  // Windows
+    #define PATH "gameSet.dat"  // Windows
 #elif defined(_WIN64)
-   #define PATH "%userprofile%\documents" // Windows
+   #define PATH "gameSet.dat" // Windows
 #elif defined(__linux__)
     #define PATH "./gameSet.dat" 
 #endif
