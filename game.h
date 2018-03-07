@@ -3,6 +3,14 @@
 #include <string.h>
 #include <time.h>
 
+#if defined(_WIN32)
+    #define PATH "%userprofile%\documents"  // Windows
+#elif defined(_WIN64)
+   #define PATH "%userprofile%\documents" // Windows
+#elif defined(__linux__)
+    #define PATH "./gameSet.dat" 
+#endif
+
 #define BOARD 9
 #define BOARD_ROW 3
 #define BOARD_COL 3

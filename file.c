@@ -44,7 +44,7 @@ void writeSettings(void){
 	content new;
 	new.set = gameSet;
 	new.points = gameStat;
-	if ( (fp = fopen("./gameSet.dat","wb")) == NULL ){
+	if ( (fp = fopen(PATH,"wb")) == NULL ){
 		applyDefault();
 		newSettings();
 	} else {
@@ -78,7 +78,7 @@ void newSettings(void){
 		content new;
 	new.set = gameSet;
 	new.points = gameStat;
-	if ( (fp = fopen("./gameSet.dat","wb")) == NULL ){
+	if ( (fp = fopen(PATH,"wb")) == NULL ){
 		printf("Error! Cant open game file");
 		return;
 	}
@@ -93,7 +93,7 @@ void readSettings(void){
 	content new;
 	new.set = gameSet;
 	new.points = gameStat;
-	if ( (fp = fopen("./gameSet.dat","rb")) == NULL ){
+	if ( (fp = fopen(PATH,"rb")) == NULL ){
 		applyDefault();
 		newSettings(); 
 	} else {

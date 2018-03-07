@@ -3,6 +3,14 @@
 #include <string.h>
 #include <time.h>
 
+#if defined(_WIN32)
+    #define PATH "%userprofile%\documents"  // Windows
+#elif defined(_WIN64)
+   #define PATH "%userprofile%\documents" // Windows
+#elif defined(__linux__)
+    #define PATH "./gameSet.dat" 
+#endif
+
 #define BOARD 9
 #define BOARD_ROW 3
 #define BOARD_COL 3
@@ -18,13 +26,14 @@
 #define DOUBLE 2
 
 #define MAX_OPTIONS 3
-#define MAX_IDENTIFIERS 10
-#define MAX_COMMANDS 4
+#define MAX_IDENTIFIERS 11
+#define MAX_COMMANDS 20
 #define IN 1
 #define OUT 0
 
 
-#define NEWLINE printf("------------------------------------------------------\n")
+#define NEWLINE printf("------------------------------------------------------------\n")
+#define NEWSCREEN printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
 typedef struct game {
 	char mat[BOARD_ROW][BOARD_COL];// The game board stored in matrix form
 	char row[BOARD]; //The game board stored in a single array
@@ -38,14 +47,6 @@ typedef struct player {
 	char sign;
 } player;
 
-typedef struct settings {
-	player p1;
-	player p2;
-	player ai;
-	int difficulty;
-	int win;
-	int loss;
-} settings;
 
 
 // aiBoard *newBoard( void );
@@ -69,9 +70,55 @@ void writeSettings(void);
 void readSettings(void);
 void newSettings(void);
 
+
+
+enum errors {err_command,err_identifier,err_move};
+void displayError(enum errors , char *);
+void displayViewHelp(void);
+void displaySetHelp(void);
+void displayNewHelp(void);
+void displayHelp(void);
+void displayHeading(char *);
+enum setting {name,ai_name,sign,mode};
+void displayChangeSettings(enum setting, char *prev, char *new);
+/* Declaration of the Global Variables */
+game gameBoard;
+// int turn = 1;
+short int maxDepth;
+player player1,player2,ai,human,p1,p2;
+
+
+
+// #include "game.h"
+// #include "settings.h"
+
+typedef struct aiBoard {
+	int score;
+	int move;
+} aiBoard;
+
+
+aiBoard *newBoard( void );
+void setDepth(void);
+aiBoard getBestMove( player , int  );
+int aiMove( void );
+aiBoard getRandomMove( aiBoard *board, player current );
+int evaluateBoard(void);
+
+
+
+typedef struct settings {
+	player p1;
+	player p2;
+	player ai;
+	int difficulty;
+	int win;
+	int loss;
+} settings;
+
 typedef struct command {
 	char name[6];
-	struct identifier *identifierList[3];
+	struct identifier *identifierList[5];
 } command;
 
 
@@ -106,34 +153,48 @@ enum difficulty {EASY=1,MEDIUM,HARD};
 enum tokens {COMMAND,IDENTIFIER,OPTION,VALUE};
 enum commands {set,new,view};
 
-typedef struct aiBoard {
-	int score;
-	int move;
-} aiBoard;
-
-
-aiBoard *newBoard( void );
-void setDepth(void);
-aiBoard getBestMove( player , int  );
-int aiMove( void );
-aiBoard getRandomMove( aiBoard *board, player current );
-int evaluateBoard(void);
-
-
-/* Declaration of the Global Variables */
-game gameBoard;
-// int turn = 1;
-short int maxDepth;
-player player1,player2,ai,human,p1,p2;
 settings gameSet;
 stat gameStat;
+// Matches a command and returns the index of the command in the command list
 
+command *matchCommand(char [][100]);
+
+/* The parse Command reads the command typed by the user and perfoms the necessary action */
+void parseCommand(char [][100], int);
+
+/*Reads the commands if the user types "set" as the initial command */
+option *parseSet(command *,char [][100], int);
+
+/*Reads the commands if the user types "new" as the initial command */
+void parseNew(command *,char [][100], int);
+/*Reads the commands if the user types "view" as the initial command */
+void parseView(command *,char [][100], int);
+/*Reads the commands if the user types "exit" as the initial command */
+void parseExit(command *,char [][100], int);
+
+
+
+void setOptions(option *); // Changes the game settings according to the command of the user
+void applyDefault( void ); // Applies the default settings
+void applySettings( void );
+void displaySettings( void ); // Displays the game settings
+void buildCommandTree(void);
+// // Splits a string removing whitespaces and stores them in an array of strings
+int stringSplit(char [], char [][100] );
+// /* Removes double quotes from a string*/
+void removeQuotes( char *);
 
 
 // #include "game.h"
+// #include "settings.h"
+// extern settings gameSet;
+// extern stat gameStat;
+
 // #include "ai.h"
 /* prints the board according to the row type of the game board*/
+
 void printBoard( ){
+	// NEWSCREEN;
 	printf("\t\t         |        |         \n");
 	printf("\t\t    %c    |    %c   |    %c     \n",gameBoard.row[6],gameBoard.row[7],gameBoard.row[8]);
 	printf("\t\t         |        |         \n");
@@ -162,6 +223,7 @@ int getMove( void ){
 				return ctoi(in[0]);
 		}
 	printf("\nInvalid Move\n");
+	putchar('>');
 	}
 	
 }
@@ -194,23 +256,28 @@ void getString(char x[]) {
 }
 
 void displaySettings( void ){
-		NEWLINE;
-	printf("Player 1 | \n");
+	// NEWSCREEN;	
+	// NEWLINE;
+	// printf("%20s|  %s  |\n"," ","Settings");
+	// 	NEWLINE;
+	displayHeading("Settings");
+	printf("| Player 1 | \n");
 	NEWLINE;
 	printf("%-12s:::\t%-10s\n","Name",gameSet.p1.name);
 	printf("%-12s:::\t%-4c\n","Sign",gameSet.p1.sign);
 		NEWLINE;
-	printf("Player 2 | \n");
+	printf("| Player 2 | \n");
 	NEWLINE;
 	printf("%-12s:::\t%-10s\n","Name",gameSet.p2.name);
 	printf("%-12s:::\t%-4c\n","Sign",gameSet.p2.sign);
 		NEWLINE;
-	printf("Computer |\n");
+	printf("| Computer |\n");
 	NEWLINE;
 	printf("%-12s:::\t%-10s\n","Name",gameSet.ai.name);
 	printf("%-12s:::\t%-4c\n","Sign",gameSet.ai.sign);
 	printf("%-12s:::\t%-6s\n","Difficulty",(gameSet.difficulty == EASY )?"Easy":((gameSet.difficulty == MEDIUM)?"Medium":"Hard"));
-	
+	NEWLINE;
+	printf("\n\n");
 }
 
 
@@ -242,7 +309,8 @@ int stringSplit( char in[], char out[][100]){
 }
 
 void displayScore( void ){
-	NEWLINE;
+	displayHeading("ScoreCard");
+	// NEWLINE;
 	printf("%-20s\tWin:%-4d\tLoss:%-4d\n","Player 1",gameStat.p1.win,gameStat.p1.lose);
 	NEWLINE;
 	// NEWLINE;
@@ -250,13 +318,127 @@ void displayScore( void ){
 	NEWLINE;
 		// NEWLINE;
 	printf("%-20s\tWin:%-4d\tLoss:%-4d\n","Computer",gameStat.ai.win,gameStat.ai.lose);
+	// NEWLINE;
+		NEWLINE;
+	printf("\n\n");
+}
+
+void displayHeading ( char *s ){
+		NEWSCREEN;	
+	NEWLINE;
+	printf("%20s|  %s  |\n"," ",s);
+		NEWLINE;
+}
+
+
+void displayError(enum errors err_type , char *s){
+
+	if ( err_type == err_command ){
+		printf("\n\nInvalid command !! Type \"view help\" to view complete list of commands. Type \"new\" to start a single player game.\n\n " );
+	} else if ( err_type == err_identifier ){
+		if ( strcmp(s,"new") == 0 ){
+			printf("\nInvalid command!! Use new command as:: \n");
+			displayNewHelp();
+		} else if ( strcmp(s,"view") == 0 ){
+			printf("\nInvalid command!! Use 'view' command as:: \n");
+			displayViewHelp();
+		} else if ( strcmp(s,"set") == 0 ){
+			printf("\nInvalid command!! Use 'set' command as:: \n");
+			displaySetHelp();
+		}
+	} else if ( err_type == err_move ){
+		printf("\nInvalid Move!!!\n");
+	}
+}
+
+// void main(){
+// 	displayError(err_identifier,"set");
+// }
+
+
+void displaySetHelp(void){
+	printf("set (player_type) (options) (value) \n\n");
+	printf("(player_type) is one of the following... \n");
+	printf("p1 : change options for player 1\n");
+	printf("p2 : change options for player 2\n");
+	printf("ai : change options for the computer \n\name");
+	printf("(options) is one of the following.... \n");
+	printf("%-5s : change the name. Give a string in the (value). Use double quotes if you want to use space \n","name");
+	printf("%-5s : change the sign used. The (value) is a single character. \n", "sign");
+	printf("%-5s : change the difficulty. Only used with ai. The (value) is \'easy\' , \'medium\' or \'hard\'.\n","mode");
+	// printf("The acceptable (value) are... \n");
 	NEWLINE;
 }
 
+void displayViewHelp(void){
+	printf("view (options) \n");
+	printf("The valid values for (options) are : \n");
+	printf("%-9s : Display the complete list of commands\n", "help");
+	printf("%-9s : Display the current game settings\n", "settings");
+	printf("%-9s : Display the total game score\n", "score");
+	printf("%-9s : View the game credits\n", "credits");
+	NEWLINE;
+}
+
+void displayNewHelp(void){
+	printf("new (game_mode) \n");
+	printf("(game_mode) is one of the following... \n");
+	printf("1p : Starts a single player\n");
+	printf("2p : Starts a two player game\n");
+	printf("A blank will automatically start a single player game\n");
+	NEWLINE;
+}
+
+void displayHelp(void){
+	displayHeading("Help");
+	printf("Use the following commands to do perform the operations\n");
+	NEWLINE;
+	printf("| 'new' Command | Start a new game.\n");
+	NEWLINE;
+	displayNewHelp();
+	NEWLINE;
+	printf("| 'view' Command | View the game settings,score, help etc.\n");
+	NEWLINE;
+	displayViewHelp();
+	NEWLINE;
+	printf("| 'set' Command | Change the game settings\n");
+	NEWLINE;
+	displaySetHelp();
+	NEWLINE;
+	printf("| 'exit' Command | Exit the game\n");
+	NEWLINE;
+}
+
+void displayChangeSettings(enum setting set, char *prev, char *current){
+	if ( set == name ){
+		printf("\nTapaiko naam '%s' bata '%s' ma badaliyeko xa. Dhanyabad. \n",prev,current);
+	} else if ( set == sign ){
+		printf("\nTapaiko sign %c bata %c ma change vayeko xa. Dhanyabad.\n",prev[0],current[0]);
+	} else if ( set == mode ){
+		if ( (strcmp(prev,"easy") == 0) && (strcmp(current,"easy") != 0 ) ){
+			printf("\nTapailai jitna garo hunexa.\n");
+		} else {
+			printf("\nTapailai jitna sajilo hunexa. \n");
+		}
+	} else if ( set == ai_name ){
+		printf("\nComputer ko naam '%s' bata '%s' ma change vayeko xa.\n",prev,current);
+	}
+}
+
+void displayFrontPage( ){
+	int i;
+	for ( i = 0; i<40; i++ )
+		putchar('*');
+	putchar('\n');
+}
 
 
 // #include "game.h"
 // #include "ai.h"
+// #include "settings.h"
+
+// extern settings gameSet;
+// extern stat gameStat;
 
 aiBoard *newBoard( void ){
 	int i;
@@ -303,7 +485,7 @@ int aiMove( void ){
 // 	// player current;
 // 	char decision;
 	
-// 	printf("\nFirst Move or Second Move? ( 1 for first and 2 for 2nd).....\n");
+// 	//printf("\nFirst Move or Second Move? ( 1 for first and 2 for 2nd).....\n");
 // 	scanf("%c",&decision);
 // 	if ( decision == '1' ){
 // 		player1.type = HUMAN;
@@ -347,7 +529,7 @@ aiBoard getBestMove( player current , int depth ){
 	for ( i = 0; i<9 ; i++ ){
 		if ( gameBoard.row[i] == ' ' ){
 			performMove( i , current.position );
-			// printBoard();
+			printBoard();
 			// depth++;
 			if ( current.type == AI )
 				score = getBestMove( human, depth + 1 ).score;
@@ -357,12 +539,11 @@ aiBoard getBestMove( player current , int depth ){
 			new[x].score = score;
 			new[x++].move = i;
 		}
-
 	}
 
-	// for ( i = 0; new[i].score!=GARBAGE &&i<9; i++ )
-	// 	printf("Score: %d\tMove:%d\t%s\n",new[i].score,new[i].move,(current.type==AI)?"AI":"Human");
-	// putchar('\n');
+	for ( i = 0; new[i].score!=GARBAGE &&i<9; i++ )
+		printf("Score: %d\tMove:%d\t%s\n",new[i].score,new[i].move,(current.type==AI)?"AI":"Human");
+	putchar('\n');
 
 
 	move = getRandomMove( new, current );
@@ -459,9 +640,12 @@ int evaluateBoard( ){
 
 }
 
-
 // #include "game.h"
 // #include "ai.h"
+// #include "settings.h"
+// extern settings gameSet;
+// extern stat gameStat;
+
 /* Initializes the board to the initial state by setting the entire board to empty*/
 void initializeBoard(void){
 	int i,j;
@@ -477,7 +661,7 @@ void initializeBoard(void){
 
 int hasEnded( void ){
 	int i;
-	/*Checking if the game has ended in any of the row*/
+	/*Checking if the game has ended in any of the row*/	
 	for ( i = 0; i<7 ; i+= 3 ){
 		/*If one of cell of the row is empty , the game has not ended in that row*/
 		if (  gameBoard.row[i+1] == ' ')
@@ -546,19 +730,31 @@ void playGame(int mode){
 		player2.position = PLAYER2;
 		winner = playSingle();
 		if ( winner == PLAYER1 ){
-			if ( player1.type == AI )
+			if ( player1.type == AI ){
 				gameStat.ai.win++;
-			else 
+				gameStat.p1.lose++;
+			}
+			else{
+				gameStat.p1.win++;
 				gameStat.ai.lose++;
+			} 
 		} else if ( winner == PLAYER2 ){
-			if ( player2.type == AI )
+			if ( player2.type == AI ){
 				gameStat.ai.win++;
-			else
+				gameStat.p1.lose++;
+			}
+			else{
 				gameStat.ai.lose++;
+				gameStat.p1.win++;
+			}
 		}
 	} else {
-		player1 = gameSet.p1;
-		player2 = gameSet.p2;
+		// player1 = gameSet.p1;
+		// player2 = gameSet.p2;
+		player1 = (gameStat.gcDouble%2)?gameSet.p2:gameSet.p1;
+		player2 = (gameStat.gcDouble%2)?gameSet.p1:gameSet.p2;
+		player1.position = PLAYER1;
+		player2.position = PLAYER2;
 		winner = playDouble();
 		if ( winner == PLAYER1 ){
 			gameStat.p1.win++;
@@ -576,7 +772,7 @@ void playGame(int mode){
 	} else {
 		printf("The game has been drawn\n");
 	}
-	// writeSettings();
+	writeSettings();
 }
 
 int playSingle( void ){
@@ -610,6 +806,7 @@ int playDouble( void ){
 	current = player1;
 
 	while ( !(rv=hasEnded()) ){
+		printf("%s's turn: ",current.name);
 		cell = getMove();
 		performMove(cell,current.position);
 		current = ( current.position == PLAYER1 )?player2:player1;
@@ -622,7 +819,11 @@ int playDouble( void ){
 
 
 // #include "game.h"
-// #include <assert.h>
+// // #include <assert.h>
+// #include "settings.h"
+// extern settings gameSet;
+// extern stat gameStat;
+
 // settings newSet;
 typedef struct {
 	settings set;
@@ -663,7 +864,7 @@ void writeSettings(void){
 	content new;
 	new.set = gameSet;
 	new.points = gameStat;
-	if ( (fp = fopen("./gameSet.dat","wb")) == NULL ){
+	if ( (fp = fopen(PATH,"wb")) == NULL ){
 		applyDefault();
 		newSettings();
 	} else {
@@ -697,7 +898,7 @@ void newSettings(void){
 		content new;
 	new.set = gameSet;
 	new.points = gameStat;
-	if ( (fp = fopen("./gameSet.dat","wb")) == NULL ){
+	if ( (fp = fopen(PATH,"wb")) == NULL ){
 		printf("Error! Cant open game file");
 		return;
 	}
@@ -712,7 +913,7 @@ void readSettings(void){
 	content new;
 	new.set = gameSet;
 	new.points = gameStat;
-	if ( (fp = fopen("./gameSet.dat","rb")) == NULL ){
+	if ( (fp = fopen(PATH,"rb")) == NULL ){
 		applyDefault();
 		newSettings(); 
 	} else {
@@ -742,50 +943,39 @@ void readSettings(void){
 
 // }
 
+
 // #include "game.h"
 // #include "ai.h"
-
-// Splits a string removing whitespaces and stores them in an array of strings
-int stringSplit(char [], char [][100] );
-/* Removes double quotes from a string*/
-void removeQuotes( char *);
-void getString( char * );
-// Matches a command and returns the index of the command in the command list
-
-command *matchCommand(char [][100]);
-
-/* The parse Command reads the command typed by the user and perfoms the necessary action */
-void parseCommand(char [][100], int);
-
-/*Reads the commands if the user types "set" as the initial command */
-option *parseSet(command *,char [][100], int);
-
-/*Reads the commands if the user types "new" as the initial command */
-void parseNew(command *,char [][100], int);
-/*Reads the commands if the user types "view" as the initial command */
-void parseView(command *,char [][100], int);
-/*Reads the commands if the user types "exit" as the initial command */
-void parseExit(command *,char [][100], int);
+// #include "settings.h"
+// settings gameSet;
+// stat gameStat;
 
 
+// void getString( char * );
 
-void setOptions(option *); // Changes the game settings according to the command of the user
-void applyDefault( void ); // Applies the default settings
-void applySettings( void );
-void displaySettings( void ); // Displays the game settings
-
-command commandList[MAX_COMMANDS]; // The list of valid commands
-identifier identifierList[MAX_IDENTIFIERS]; // The list of valid identifiers ( p1 ( player 1) , p2(player2) , ai  etc..)
-option optionList[MAX_OPTIONS]; // The list of options like name, sign etc.
-
+// command commandList[MAX_COMMANDS]; // The list of valid commands
+command *commandList;
+// identifier identifierList[MAX_IDENTIFIERS]; // The list of valid identifiers ( p1 ( player 1) , p2(player2) , ai  etc..)
+identifier *identifierList; 
+// option optionList[MAX_OPTIONS]; // The list of options like name, sign etc.
+option *optionList;
 void buildCommandTree(){
 	int i = 0,j=0;
+	commandList = malloc(sizeof(command)*MAX_COMMANDS);
+	identifierList = malloc(sizeof(identifier)*MAX_IDENTIFIERS);
+	optionList = malloc(sizeof(option)*MAX_OPTIONS);
 	for ( i = 0; i<MAX_COMMANDS; i++ ){
-		for ( j = 0; j<3; j++ )
+		for ( j = 0; j<5; j++ )
 			commandList[i].identifierList[j] = NULL;
 	}
 
-	for ( i = 0; i<MAX_IDENTIFIERS; i++ ){
+	// for ( i = 0; i<MAX_IDENTIFIERS; i++ )
+	// 	identifierList[i] = (identifier *)NULL;
+
+	// for ( i = 0; i<optionList; i++ )
+	// 	optionList[i] = (option *)NULL;
+
+	for ( i = 0; i<MAX_IDENTIFIERS; i++ ){	
 		for ( j = 0; j<4; j++ )
 			identifierList[i].optionList[j] = NULL;
 	}
@@ -793,7 +983,8 @@ void buildCommandTree(){
 	strcpy(commandList[1].name , "new");
 	strcpy(commandList[2].name ,"view");
 	strcpy(commandList[3].name , "exit");
-	// printf("current command: %s\n",commandList[3].name);
+	strcpy(commandList[4].name , "clear");
+	// //printf("current command: %s\n",commandList[3].name);
 
 	commandList[0].identifierList[0] = &identifierList[0]; // identiferList[0] is player 1
 	commandList[0].identifierList[1] = &identifierList[1]; // identifierList[1] is player 2
@@ -834,45 +1025,20 @@ void buildCommandTree(){
 	strcpy(optionList[0].name , "name" );
 	strcpy(optionList[1].name , "sign");
 	strcpy(optionList[2].name , "mode");
+	
+		// strcpy(commandList[3].name , "exit");
+		// strcpy(identifierList[8].name , "help");
+	return;
 
 }
 
 
-int main(){
-	int k;
-	buildCommandTree();
-		strcpy(commandList[3].name , "exit");
-	// printf("current command: %s\n",commandList[3].name);
-	// gameSet.p1 = &player1;
-	// gameSet.p2 = &player2;
-	gameSet.difficulty = EASY;
-	char command[100];
-	char tokenList[10][100];
-	// readSettings();
-	applyDefault();
-	// gameStat.gcSingle = 0;
-	srand(time(NULL));
-	while ( 1) {
-		putchar('>');
-		// scanf("%[^\n]",command);
-		// gets(command);
-		getString(command);
-		// getchar();
-		k = stringSplit(command,tokenList);
-		// printf("tokens : %d\n",k);
-		
-		parseCommand(tokenList, k);
-		// getchar();
-		// printf("%d\n",gameSet.difficulty);
-		// displaySettings();
-	}
-}
 
 
 command *matchCommand( char tokenList[][100] ){
 	int i =0;
 	for ( i = 0; i<MAX_COMMANDS ; i++ ){
-		// printf("%s\t%s\n",tokenList[COMMAND],commandList[i].name);
+		// //printf("%s\t%s\n",tokenList[COMMAND],commandList[i].name);
 		if ( strcmp(tokenList[COMMAND],commandList[i].name) == 0 )
 			return &commandList[i];
 	}
@@ -886,9 +1052,10 @@ void parseCommand(char tokenList[][100], int tokens){ // tokens is the number of
 	// identifier *identify = NULL;
 	option *opt = NULL;
 	current = matchCommand(tokenList);
-	// printf("\n%s\n",tokenList[0]);
+	// //printf("\n%s\n",tokenList[0]);
 
 	if ( current == NULL ){
+		displayError(err_command,"n");
 		return;
 	} else if ( strcmp(current->name,"set") == 0 ){  // If the command is to change the settings
 		opt  = parseSet(current,tokenList,tokens);
@@ -901,10 +1068,14 @@ void parseCommand(char tokenList[][100], int tokens){ // tokens is the number of
 		parseView(current,tokenList,tokens);
 
 	} else if ( strcmp(current->name,"exit") == 0){
-		printf("Exiting\n");
+		//printf("Exiting\n");
+		 printf("\nJiskeko ma sanga? Khelna man xaina vane nakhelna kina dukha deko malai\n\n\n");
 		exit(1);
+	} else if ( strcmp(current->name,"clear") == 0 ){
+		NEWSCREEN;
 	} else {
-		printf("Invaid command\n");
+		displayError(err_command,"n");
+		//printf("Invaid command\n");
 	}
 	return;
 
@@ -916,33 +1087,42 @@ void setOptions(option *new ){
 
 	if ( strcmp(new->name,"name") == 0 ){
 		if ( strcmp(new->identifierType,"p1") == 0 ){
+			displayChangeSettings(name,gameSet.p1.name,new->value);
 			strcpy(gameSet.p1.name,new->value);
 		} else if ( strcmp(new->identifierType,"p2") == 0) {
+			displayChangeSettings(name,gameSet.p2.name,new->value);
 			strcpy(gameSet.p2.name,new->value);
 		} else {
+			displayChangeSettings(ai_name,gameSet.ai.name,new->value);
 			strcpy(gameSet.ai.name,new->value);
 		}
 	} else if ( strcmp(new->name, "sign") == 0 ){
 		if ( strcmp(new->identifierType,"p1") == 0 ){
+			displayChangeSettings(sign,&gameSet.p1.sign,(new->value));
 			gameSet.p1.sign = new->value[0];
 		} else if ( strcmp(new->identifierType,"p2") == 0 ){
+			displayChangeSettings(sign,&gameSet.p2.sign,(new->value));
 			gameSet.p2.sign = new->value[0];
 		} else {
+			displayChangeSettings(sign,&gameSet.ai.sign,(new->value));
 			gameSet.ai.sign = new->value[0];
 		}
 	} else if ( strcmp(new->name, "mode") == 0 ){
 		if ( strcmp(new->value,"easy") == 0 ){
+			displayChangeSettings( mode, (gameSet.difficulty == EASY)?"easy":((gameSet.difficulty == MEDIUM)?"medium":"hard") , new->value);
 			gameSet.difficulty = EASY;
 		} else if ( strcmp(new->value , "medium") == 0 ){
+			displayChangeSettings( mode, (gameSet.difficulty == EASY)?"easy":((gameSet.difficulty == MEDIUM)?"medium":"hard") , new->value);
 			gameSet.difficulty = MEDIUM;
 		} else if ( strcmp(new->value,"hard") == 0 ){
+			displayChangeSettings( mode, (gameSet.difficulty == EASY)?"easy":((gameSet.difficulty == MEDIUM)?"medium":"hard") , new->value);
 			gameSet.difficulty = HARD;
 		} else {
-			printf("\nValue not recognized\n");
+			//printf("\nValue not recognized\n");
 			return;
 		}
 	}
-	// writeSettings();
+	writeSettings();
 }
 
 
@@ -969,57 +1149,60 @@ option *parseSet( command *current, char tokenList[][100] , int tokens ){
 	int i;
 	identifier *identify = NULL;
 	option *opt = NULL;
-	printf("\n%s\n",current->name);
-		if ( tokens != 4 ){
-			printf("\nInvalid arguments\n");
-			return NULL;
-		}
+	//printf("\n%s\n",current->name);
+		// if ( tokens != 4 ){
+		// 	//printf("\nInvalid arguments\n");
+		// 	return NULL;
+		// }
 		for ( i = 0; i<3 && current->identifierList[i] != NULL ; i++ ){
 			if ( strcmp(current->identifierList[i]->name, tokenList[IDENTIFIER]) == 0 ){
 				identify = current->identifierList[i];
 				break;
 			}
 		} 
-		if (identify == NULL ) {
-			printf("identifier Not found\n");
+		if (identify == NULL || tokens < 4 ) {
+			//printf("identifier Not found\n");
+			displayError(err_identifier,current->name);
 			return NULL;
 		}
 
 		for ( i = 0; i<3 && identify->optionList[i] != NULL ; i++ ){
-			// printf("\n%s \t %s \t %s \n",tokenList[OPTION],identify->optionList[i]->name,identify->name	);
+			// //printf("\n%s \t %s \t %s \n",tokenList[OPTION],identify->optionList[i]->name,identify->name	);
 				if ( strcmp(identify->optionList[i]->name,tokenList[OPTION]) == 0 ){
 					opt = identify->optionList[i];
 					removeQuotes(tokenList[VALUE]);
 					strcpy(opt->identifierType,identify->name);
 
 					strcpy(opt->value,tokenList[VALUE]);
-					printf("Writing to options \t %s\n",opt->value);
+					//printf("Writing to options \t %s\n",opt->value);
 					// setOptions(opt);
 					return opt;
 				}
 		}
-		printf("Invalid options \n");
+		//printf("Invalid options \n");
 		return NULL;
 
 }
 
 void parseNew(command *current, char tokenList[][100], int tokens ){
-	printf("\n%s\n",current->name);	
+	//printf("\n%s\n",current->name);	
 		if ( tokens > 2 ){
-			printf("Invalid number of arguments\n");
+			displayError(err_identifier,current->name);
+			//printf("Invalid number of arguments\n");
 			return;
 		}
 		if ( tokens == 1 ){
 			playGame(SINGLE);
-			// printf("\nStarting a new game \n");
+			// //printf("\nStarting a new game \n");
 		} else if ( strcmp(current->identifierList[0]->name, tokenList[IDENTIFIER]) == 0 ){
 			playGame(SINGLE);
-			// printf("\nStarting a single player game\n");
+			// //printf("\nStarting a single player game\n");
 		} else if ( strcmp(current->identifierList[1]->name, tokenList[IDENTIFIER]) == 0 ) {
 			playGame(DOUBLE);
-			printf("\nStarting two player game\n");
+			//printf("\nStarting two player game\n");
 		} else {
-			printf("Command  not recognized\n");
+			//printf("Command  not recognized\n");
+			displayError(err_identifier,current->name);
 			return;
 		}
 
@@ -1028,36 +1211,76 @@ void parseNew(command *current, char tokenList[][100], int tokens ){
 void parseView( command *current, char tokenList[][100], int tokens ){
 	identifier *identify = NULL;
 	int i;
-	printf("\n%s\n",current->name);
+	// printf("\n%s\n",current->name);
 		if  (tokens != 2  ){
-			printf("Invalid number of arguments\n");
+			// printf("Invalid number of arguments\n");
+			displayError(err_identifier,current->name);
 			return;
 		}
 		for ( i = 0; i<MAX_IDENTIFIERS && current->identifierList[i] != NULL ; i++ ){
+			// printf("%s\n",current->identifierList[i]->name);
 			if ( strcmp(current->identifierList[i]->name, tokenList[IDENTIFIER]) == 0 ){
 				identify = current->identifierList[i];
 				break;
 			}
 		} 
 		if ( identify == NULL ){
-			printf("\nInvlaid Command\n");
+			// printf("\nInvlaid Command\n");
+			displayError(err_identifier,current->name);
 			return;
 		}
 		if ( strcmp(identify->name, "score") == 0 ){
-			printf("\nDisplaying Score\n");
+			//printf("\nDisplaying Score\n");
 			displayScore();
 		} else if ( strcmp(identify->name, "settings") == 0){
-			// printf("\nDisplaying Settings\n");
+			// //printf("\nDisplaying Settings\n");
 			displaySettings();
 		} else if ( strcmp(identify->name, "help") == 0 ){
-			printf("Printing Help\n");
+			displayHelp();
 		} else if ( strcmp(identify->name, "credits") == 0 ){
 			printf("Printing Credits\n");
 		} else {
-			printf("Command not recognized\n");
+			// printf("Command not recognized\n");
+			displayError(err_identifier,current->name);
 			return;
 		}
 
 }
 
 
+// #include "game.h"
+// #include "ai.h"
+// #include "settings.h"
+// extern settings gameSet;
+// extern stat gameStat;
+
+int main(){
+	int k;
+	buildCommandTree();
+	printf("%s\n",PATH);
+		// strcpy(commandList[3].name , "exit");
+	// //printf("current command: %s\n",commandList[3].name);
+	// gameSet.p1 = &player1;
+	// gameSet.p2 = &player2;
+	gameSet.difficulty = EASY;
+	char command[100];
+	char tokenList[10][100];
+	readSettings();
+	// applyDefault();
+	// gameStat.gcSingle = 0;
+	srand(time(NULL));
+	while ( 1) {
+		putchar('>');
+		// scanf("%[^\n]",command);
+		// gets(command);
+		getString(command);
+		// getchar();
+		k = stringSplit(command,tokenList);
+		// //printf("tokens : %d\n",k);
+		
+		parseCommand(tokenList, k);
+		// getchar();
+		// //printf("%d\n",gameSet.difficulty);
+		// displaySettings();
+	}
+}

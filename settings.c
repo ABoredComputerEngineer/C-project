@@ -4,10 +4,7 @@
 settings gameSet;
 stat gameStat;
 
-// // Splits a string removing whitespaces and stores them in an array of strings
-int stringSplit(char [], char [][100] );
-// /* Removes double quotes from a string*/
-void removeQuotes( char *);
+
 // void getString( char * );
 
 // command commandList[MAX_COMMANDS]; // The list of valid commands
@@ -90,35 +87,6 @@ void buildCommandTree(){
 }
 
 
-int main(){
-	int k;
-	buildCommandTree();
-		// strcpy(commandList[3].name , "exit");
-	// //printf("current command: %s\n",commandList[3].name);
-	// gameSet.p1 = &player1;
-	// gameSet.p2 = &player2;
-	gameSet.difficulty = EASY;
-	char command[100];
-	char tokenList[10][100];
-	readSettings();
-	// applyDefault();
-	// gameStat.gcSingle = 0;
-	srand(time(NULL));
-	while ( 1) {
-		putchar('>');
-		// scanf("%[^\n]",command);
-		// gets(command);
-		getString(command);
-		// getchar();
-		k = stringSplit(command,tokenList);
-		// //printf("tokens : %d\n",k);
-		
-		parseCommand(tokenList, k);
-		// getchar();
-		// //printf("%d\n",gameSet.difficulty);
-		// displaySettings();
-	}
-}
 
 
 command *matchCommand( char tokenList[][100] ){
