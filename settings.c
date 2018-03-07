@@ -40,6 +40,7 @@ void buildCommandTree(){
 	strcpy(commandList[1].name , "new");
 	strcpy(commandList[2].name ,"view");
 	strcpy(commandList[3].name , "exit");
+	strcpy(commandList[4].name , "clear");
 	// //printf("current command: %s\n",commandList[3].name);
 
 	commandList[0].identifierList[0] = &identifierList[0]; // identiferList[0] is player 1
@@ -154,7 +155,10 @@ void parseCommand(char tokenList[][100], int tokens){ // tokens is the number of
 
 	} else if ( strcmp(current->name,"exit") == 0){
 		//printf("Exiting\n");
+		 printf("\nJiskeko ma sanga? Khelna man xaina vane nakhelna kina dukha deko malai\n\n\n");
 		exit(1);
+	} else if ( strcmp(current->name,"clear") == 0 ){
+		NEWSCREEN;
 	} else {
 		displayError(err_command,"n");
 		//printf("Invaid command\n");
@@ -169,26 +173,35 @@ void setOptions(option *new ){
 
 	if ( strcmp(new->name,"name") == 0 ){
 		if ( strcmp(new->identifierType,"p1") == 0 ){
+			displayChangeSettings(name,gameSet.p1.name,new->value);
 			strcpy(gameSet.p1.name,new->value);
 		} else if ( strcmp(new->identifierType,"p2") == 0) {
+			displayChangeSettings(name,gameSet.p2.name,new->value);
 			strcpy(gameSet.p2.name,new->value);
 		} else {
+			displayChangeSettings(ai_name,gameSet.ai.name,new->value);
 			strcpy(gameSet.ai.name,new->value);
 		}
 	} else if ( strcmp(new->name, "sign") == 0 ){
 		if ( strcmp(new->identifierType,"p1") == 0 ){
+			displayChangeSettings(sign,&gameSet.p1.sign,(new->value));
 			gameSet.p1.sign = new->value[0];
 		} else if ( strcmp(new->identifierType,"p2") == 0 ){
+			displayChangeSettings(sign,&gameSet.p2.sign,(new->value));
 			gameSet.p2.sign = new->value[0];
 		} else {
+			displayChangeSettings(sign,&gameSet.ai.sign,(new->value));
 			gameSet.ai.sign = new->value[0];
 		}
 	} else if ( strcmp(new->name, "mode") == 0 ){
 		if ( strcmp(new->value,"easy") == 0 ){
+			displayChangeSettings( mode, (gameSet.difficulty == EASY)?"easy":((gameSet.difficulty == MEDIUM)?"medium":"hard") , new->value);
 			gameSet.difficulty = EASY;
 		} else if ( strcmp(new->value , "medium") == 0 ){
+			displayChangeSettings( mode, (gameSet.difficulty == EASY)?"easy":((gameSet.difficulty == MEDIUM)?"medium":"hard") , new->value);
 			gameSet.difficulty = MEDIUM;
 		} else if ( strcmp(new->value,"hard") == 0 ){
+			displayChangeSettings( mode, (gameSet.difficulty == EASY)?"easy":((gameSet.difficulty == MEDIUM)?"medium":"hard") , new->value);
 			gameSet.difficulty = HARD;
 		} else {
 			//printf("\nValue not recognized\n");
@@ -309,7 +322,7 @@ void parseView( command *current, char tokenList[][100], int tokens ){
 			// //printf("\nDisplaying Settings\n");
 			displaySettings();
 		} else if ( strcmp(identify->name, "help") == 0 ){
-			printf("Printing Help\n");
+			displayHelp();
 		} else if ( strcmp(identify->name, "credits") == 0 ){
 			printf("Printing Credits\n");
 		} else {

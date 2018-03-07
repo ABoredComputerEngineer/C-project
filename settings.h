@@ -45,6 +45,7 @@ enum difficulty {EASY=1,MEDIUM,HARD};
 enum tokens {COMMAND,IDENTIFIER,OPTION,VALUE};
 enum commands {set,new,view};
 
+
 // Matches a command and returns the index of the command in the command list
 
 command *matchCommand(char [][100]);

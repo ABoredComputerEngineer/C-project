@@ -5,7 +5,7 @@ extern stat gameStat;
 
 // #include "ai.h"
 /* prints the board according to the row type of the game board*/
-void displayHeading(char *);
+
 void printBoard( ){
 	// NEWSCREEN;
 	printf("\t\t         |        |         \n");

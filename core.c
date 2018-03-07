@@ -19,7 +19,7 @@ void initializeBoard(void){
 
 int hasEnded( void ){
 	int i;
-	/*Checking if the game has ended in any of the row*/
+	/*Checking if the game has ended in any of the row*/	
 	for ( i = 0; i<7 ; i+= 3 ){
 		/*If one of cell of the row is empty , the game has not ended in that row*/
 		if (  gameBoard.row[i+1] == ' ')
@@ -88,15 +88,23 @@ void playGame(int mode){
 		player2.position = PLAYER2;
 		winner = playSingle();
 		if ( winner == PLAYER1 ){
-			if ( player1.type == AI )
+			if ( player1.type == AI ){
 				gameStat.ai.win++;
-			else 
+				gameStat.p1.lose++;
+			}
+			else{
+				gameStat.p1.win++;
 				gameStat.ai.lose++;
+			} 
 		} else if ( winner == PLAYER2 ){
-			if ( player2.type == AI )
+			if ( player2.type == AI ){
 				gameStat.ai.win++;
-			else
+				gameStat.p1.lose++;
+			}
+			else{
 				gameStat.ai.lose++;
+				gameStat.p1.win++;
+			}
 		}
 	} else {
 		// player1 = gameSet.p1;

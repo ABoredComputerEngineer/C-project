@@ -24,8 +24,8 @@
 #define OUT 0
 
 
-#define NEWLINE printf("------------------------------------------------------\n")
-#define NEWSCREEN printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
+#define NEWLINE printf("------------------------------------------------------------\n")
+#define NEWSCREEN printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
 typedef struct game {
 	char mat[BOARD_ROW][BOARD_COL];// The game board stored in matrix form
 	char row[BOARD]; //The game board stored in a single array
@@ -69,7 +69,10 @@ void displayError(enum errors , char *);
 void displayViewHelp(void);
 void displaySetHelp(void);
 void displayNewHelp(void);
-
+void displayHelp(void);
+void displayHeading(char *);
+enum setting {name,ai_name,sign,mode};
+void displayChangeSettings(enum setting, char *prev, char *new);
 /* Declaration of the Global Variables */
 game gameBoard;
 // int turn = 1;
