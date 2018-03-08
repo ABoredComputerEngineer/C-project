@@ -120,26 +120,6 @@ void displayScore( void ){
 	displayScoreCurrent();
 	printf("| Lifetime Stats | \n");
 	displayScoreLifeTime();
-	// NEWLINE;
-	// printf("%-20s\tWin: %-4d\tLoss: %-4d\n","Player 1",currentStat.p1.win,currentStat.p1.lose);
-	// NEWLINE;
-	// printf("%-20s\tWin: %-4d\tLoss: %-4d\n","Player 2",currentStat.p2.win,gameStat.p2.lose);
-	// NEWLINE;
-	// printf("%-20s\tWin: %-4d\tLoss: %-4d\n","Computer",currentStat.ai.win,currentStat.ai.lose);
-	// NEWLINE;
-	// printf("%-20s\t%s: %-4d\t%s: %-4d\n","Games Played","Single",currentStat.gcSingle,"Two Player",currentStat.gcDouble);
-	// NEWLINE;
-	// printf("| Lifetime Stats | \n");
-	// NEWLINE;
-	// printf("%-20s\tWin: %-4d\tLoss: %-4d\n","Player 1",gameStat.p1.win,gameStat.p1.lose);
-	// NEWLINE;
-	// printf("%-20s\tWin: %-4d\tLoss: %-4d\n","Player 2",gameStat.p2.win,gameStat.p2.lose);
-	// NEWLINE;
-	// printf("%-20s\tWin: %-4d\tLoss: %-4d\n","Computer",gameStat.ai.win,gameStat.ai.lose);
-	// NEWLINE;
-	// printf("%-20s\t%s: %-4d\t%s: %-4d\n","Games Played","Single",gameStat.gcSingle,"Two Player",gameStat.gcDouble);
-	// NEWLINE;
-	// printf("\n\n");
 }
 
 void displayHeading ( char *s ){

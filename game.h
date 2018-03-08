@@ -12,8 +12,6 @@
 #endif
 
 #define BOARD 9
-#define BOARD_ROW 3
-#define BOARD_COL 3
 #define PLAYER1 1
 #define PLAYER2 2
 #define TIE 3
@@ -26,8 +24,8 @@
 #define DOUBLE 2
 
 #define MAX_OPTIONS 3
-#define MAX_IDENTIFIERS 11
-#define MAX_COMMANDS 20
+#define MAX_IDENTIFIERS 9
+#define MAX_COMMANDS 6
 #define IN 1
 #define OUT 0
 
@@ -35,7 +33,6 @@
 #define NEWLINE printf("--------------------------------------------------------------------\n")
 #define NEWSCREEN printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
 typedef struct game {
-	char mat[BOARD_ROW][BOARD_COL];// The game board stored in matrix form
 	char row[BOARD]; //The game board stored in a single array
 } game; 
 

@@ -62,4 +62,4 @@ void parseView(command *,char [][100], int);
 void setOptions(option *); // Changes the game settings according to the command of the user
 void applyDefault( void ); // Applies the default settings
 void buildCommandTree(void); // Build the command tree for command line
-void reset(void);
+void reset(void); //Resets the game settings to default and all scores to 0

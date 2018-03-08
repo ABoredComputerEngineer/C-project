@@ -2,8 +2,8 @@
 #include "ai.h"
 #include "settings.h"
 
-// extern settings gameSet; // defined in settings.c
-// extern stat gameStat; // defined in settings.c
+extern settings gameSet; // defined in settings.c
+extern stat gameStat; // defined in settings.c
 
 
 int main(){
