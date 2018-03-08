@@ -3,16 +3,14 @@
 extern settings gameSet;
 extern stat gameStat;
 
-// #include "ai.h"
 /* prints the board according to the row type of the game board*/
 
-void printBoard( ){
-	// NEWSCREEN;
+void printBoard( void ){
+	NEWSCREEN;
 	printf("\t\t         |        |         \n");
 	printf("\t\t    %c    |    %c   |    %c     \n",gameBoard.row[6],gameBoard.row[7],gameBoard.row[8]);
 	printf("\t\t         |        |         \n");
 	printf("\t\t---------|--------|---------\n");
-	//printf("\t\t         |        |         \n");
 	printf("\t\t         |        |         \n");
 	printf("\t\t    %c    |    %c   |    %c     \n",gameBoard.row[3],gameBoard.row[4],gameBoard.row[5]);
 	printf("\t\t         |        |         \n");
@@ -20,7 +18,6 @@ void printBoard( ){
 	printf("\t\t         |        |         \n");
 	printf("\t\t    %c    |    %c   |    %c     \n",gameBoard.row[0],gameBoard.row[1],gameBoard.row[2]);
 	printf("\t\t         |        |         \n"); 
-	// printf("\t\t         |        |         \n");
 	putchar('\n');
 }
 
@@ -69,10 +66,6 @@ void getString(char x[]) {
 }
 
 void displaySettings( void ){
-	// NEWSCREEN;	
-	// NEWLINE;
-	// printf("%20s|  %s  |\n"," ","Settings");
-	// 	NEWLINE;
 	displayHeading("Settings");
 	printf("| Player 1 | \n");
 	NEWLINE;
@@ -123,16 +116,12 @@ int stringSplit( char in[], char out[][100]){
 
 void displayScore( void ){
 	displayHeading("ScoreCard");
-	// NEWLINE;
 	printf("%-20s\tWin:%-4d\tLoss:%-4d\n","Player 1",gameStat.p1.win,gameStat.p1.lose);
 	NEWLINE;
-	// NEWLINE;
 	printf("%-20s\tWin:%-4d\tLoss:%-4d\n","Player 2",gameStat.p2.win,gameStat.p2.lose);
 	NEWLINE;
-		// NEWLINE;
 	printf("%-20s\tWin:%-4d\tLoss:%-4d\n","Computer",gameStat.ai.win,gameStat.ai.lose);
-	// NEWLINE;
-		NEWLINE;
+	NEWLINE;
 	printf("\n\n");
 }
 
@@ -164,10 +153,6 @@ void displayError(enum errors err_type , char *s){
 	}
 }
 
-// void main(){
-// 	displayError(err_identifier,"set");
-// }
-
 
 void displaySetHelp(void){
 	printf("set (player_type) (options) (value) \n\n");
@@ -179,7 +164,6 @@ void displaySetHelp(void){
 	printf("%-5s : change the name. Give a string in the (value). Use double quotes if you want to use space \n","name");
 	printf("%-5s : change the sign used. The (value) is a single character. \n", "sign");
 	printf("%-5s : change the difficulty. Only used with ai. The (value) is \'easy\' , \'medium\' or \'hard\'.\n","mode");
-	// printf("The acceptable (value) are... \n");
 	NEWLINE;
 }
 
@@ -224,17 +208,17 @@ void displayHelp(void){
 
 void displayChangeSettings(enum setting set, char *prev, char *current){
 	if ( set == name ){
-		printf("\nTapaiko naam '%s' bata '%s' ma badaliyeko xa. Dhanyabad. \n",prev,current);
+		printf("\nName changed from \"%s\" to \"%s\".\n",prev,current);
 	} else if ( set == sign ){
-		printf("\nTapaiko sign %c bata %c ma change vayeko xa. Dhanyabad.\n",prev[0],current[0]);
+		printf("\nName changed from \"%c\" to \"%c\".\n\n",prev[0],current[0]);
 	} else if ( set == mode ){
 		if ( (strcmp(prev,"easy") == 0) && (strcmp(current,"easy") != 0 ) ){
-			printf("\nTapailai jitna garo hunexa.\n");
+			printf("\nDifficulty has been decreased.\n");
 		} else {
-			printf("\nTapailai jitna sajilo hunexa. \n");
+			printf("\nDifficulty has increased. \n");
 		}
 	} else if ( set == ai_name ){
-		printf("\nComputer ko naam '%s' bata '%s' ma change vayeko xa.\n",prev,current);
+		printf("\nComputer name changed form \"%s\" to \"%s\".\n",prev,current);
 	}
 }
 

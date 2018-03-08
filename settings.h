@@ -24,7 +24,6 @@ typedef struct option{
 	char name[50];
 	char identifierType[15];
 	char value[100];
-	// struct option *next;
 } option;
 
 typedef struct wl {
@@ -60,17 +59,12 @@ option *parseSet(command *,char [][100], int);
 void parseNew(command *,char [][100], int);
 /*Reads the commands if the user types "view" as the initial command */
 void parseView(command *,char [][100], int);
-/*Reads the commands if the user types "exit" as the initial command */
-void parseExit(command *,char [][100], int);
-
 
 
 void setOptions(option *); // Changes the game settings according to the command of the user
 void applyDefault( void ); // Applies the default settings
-void applySettings( void );
-void displaySettings( void ); // Displays the game settings
 void buildCommandTree(void);
-// // Splits a string removing whitespaces and stores them in an array of strings
-int stringSplit(char [], char [][100] );
-// /* Removes double quotes from a string*/
-void removeQuotes( char *);
+// Splits a string removing whitespaces and stores them in an array of strings
+// int stringSplit(char [], char [][100] );
+ /* Removes double quotes from a string*/
+// void removeQuotes( char *);	

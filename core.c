@@ -107,8 +107,6 @@ void playGame(int mode){
 			}
 		}
 	} else {
-		// player1 = gameSet.p1;
-		// player2 = gameSet.p2;
 		player1 = (gameStat.gcDouble%2)?gameSet.p2:gameSet.p1;
 		player2 = (gameStat.gcDouble%2)?gameSet.p1:gameSet.p2;
 		player1.position = PLAYER1;
@@ -141,7 +139,6 @@ int playSingle( void ){
 	int cell,rv;
 	setDepth();
 	while ( !(rv=hasEnded()) ){
-		printf("%s\n",(current.type == AI)?"Ai turn":"Human turn");
 		if ( current.type == AI )
 			cell = aiMove();
 		else {

@@ -42,44 +42,6 @@ int aiMove( void ){
 }
 
 
-
-
-
-// int main( ){
-// 	// delay( 5 );
-// 	// int i, cell;
-// 	// player current;
-// 	char decision;
-	
-// 	//printf("\nFirst Move or Second Move? ( 1 for first and 2 for 2nd).....\n");
-// 	scanf("%c",&decision);
-// 	if ( decision == '1' ){
-// 		player1.type = HUMAN;
-	
-// 		player1.sign = '0';
-
-// 		player2.type = AI;
-// 		player2.position = PLAYER2;
-// 		player2.sign = 'X';
-
-// 	} else {
-// 		player1.type = AI;
-// 	player1.position = PLAYER1;
-// 	player1.sign = '0';
-
-// 	player2.type = HUMAN;
-
-// 	player2.sign = 'X';
-
-// 	}
-// 	srand(time(NULL));
-// 	initializeBoard();
-// 	playGame(SINGLE);
-// 	return 0;
-// }
-
-
-
 aiBoard getBestMove( player current , int depth ){
 	int i,score,rv,x = 0;
 	aiBoard *new = newBoard() ;
@@ -95,8 +57,6 @@ aiBoard getBestMove( player current , int depth ){
 	for ( i = 0; i<9 ; i++ ){
 		if ( gameBoard.row[i] == ' ' ){
 			performMove( i , current.position );
-			printBoard();
-			// depth++;
 			if ( current.type == AI )
 				score = getBestMove( human, depth + 1 ).score;
 			 else
@@ -106,11 +66,6 @@ aiBoard getBestMove( player current , int depth ){
 			new[x++].move = i;
 		}
 	}
-
-	for ( i = 0; new[i].score!=GARBAGE &&i<9; i++ )
-		printf("Score: %d\tMove:%d\t%s\n",new[i].score,new[i].move,(current.type==AI)?"AI":"Human");
-	putchar('\n');
-
 
 	move = getRandomMove( new, current );
 	free(new);

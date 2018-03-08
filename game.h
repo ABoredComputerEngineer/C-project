@@ -4,9 +4,9 @@
 #include <time.h>
 
 #if defined(_WIN32)
-    #define PATH "%userprofile%\documents"  // Windows
+    #define PATH "gameSet.dat"  // Windows
 #elif defined(_WIN64)
-   #define PATH "%userprofile%\documents" // Windows
+   #define PATH "gameSet.dat" // Windows
 #elif defined(__linux__)
     #define PATH "./gameSet.dat" 
 #endif
@@ -48,9 +48,7 @@ typedef struct player {
 } player;
 
 
-
-// aiBoard *newBoard( void );
-// void setDepth( void );
+/*Fucntions for core game*/
 int ctoi( char c );
 void initializeBoard(void);
 void printBoard( void );
@@ -64,25 +62,35 @@ int playDouble(void);
 void getString( char * );
 void displayScore( void );
 void applyDefault(void);
-// int aiMove(void);
+
+/*Functions for file handling*/
 void newSettings(void);
 void writeSettings(void);
 void readSettings(void);
-void newSettings(void);
 
 
-
+/* Functions for error handling and displaying */
 enum errors {err_command,err_identifier,err_move};
 void displayError(enum errors , char *);
+
+/* Input Output functions */
+void printBoard( void );
+int getMove( void );
+int ctoi( char );
+void removeQuotes( char * );
+void getString(char *);
+int stringSplit( char *, char [][100]);
 void displayViewHelp(void);
 void displaySetHelp(void);
 void displayNewHelp(void);
 void displayHelp(void);
 void displayHeading(char *);
 enum setting {name,ai_name,sign,mode};
-void displayChangeSettings(enum setting, char *prev, char *new);
+void displayChangeSettings(enum setting, char *, char *);
+void displaySettings( void ); // Displays the game settings
+
+
 /* Declaration of the Global Variables */
 game gameBoard;
-// int turn = 1;
 short int maxDepth;
 player player1,player2,ai,human,p1,p2;
