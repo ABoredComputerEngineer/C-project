@@ -1,7 +1,7 @@
 #include "game.h"
 #include "settings.h"
-extern settings gameSet;
-extern stat gameStat;
+extern settings gameSet; // defined in settings.c
+extern stat gameStat; // defined in settings.c
 
 typedef struct {
 	settings set;
@@ -14,10 +14,7 @@ void writeSettings(void){
 	content new;
 	new.set = gameSet;
 	new.points = gameStat;
-	if ( (fp = fopen(PATH,"wb")) == NULL ){
-		applyDefault();
-		newSettings();
-	} else {
+	if ( (fp = fopen(PATH,"wb")) != NULL ){
 		fwrite(&new,sizeof(content),1,fp);
 		fclose(fp);
 	}
@@ -25,7 +22,7 @@ void writeSettings(void){
 
 void newSettings(void){
 	FILE *fp;
-		content new;
+	content new;
 	new.set = gameSet;
 	new.points = gameStat;
 	if ( (fp = fopen(PATH,"wb")) == NULL ){
@@ -43,7 +40,7 @@ void readSettings(void){
 	new.set = gameSet;
 	new.points = gameStat;
 	if ( (fp = fopen(PATH,"rb")) == NULL ){
-		applyDefault();
+		// applyDefault();
 		newSettings(); 
 	} else {
 		x = (int)fread(&new,sizeof(content),1,fp);

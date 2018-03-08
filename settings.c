@@ -3,6 +3,7 @@
 #include "settings.h"
 settings gameSet;
 stat gameStat;
+stat currentStat;
 
 command *commandList;
 identifier *identifierList; 
@@ -26,6 +27,7 @@ void buildCommandTree(){
 	strcpy(commandList[2].name ,"view");
 	strcpy(commandList[3].name , "exit");
 	strcpy(commandList[4].name , "clear");
+	strcpy(commandList[5].name , "reset");
 
 	commandList[0].identifierList[0] = &identifierList[0]; // identiferList[0] is player 1
 	commandList[0].identifierList[1] = &identifierList[1]; // identifierList[1] is player 2
@@ -105,11 +107,17 @@ void parseCommand(char tokenList[][100], int tokens){ // tokens is the number of
 		free(commandList);
 		free(optionList);
 		free(identifierList);
+		printf("\nThe stats for this session are::: \n");
+		displayScoreCurrent();
 		 printf("\nThanks for playing!!!!!\n\n\n");
 		exit(1);
 	} else if ( strcmp(current->name,"clear") == 0 ){
 		NEWSCREEN;
-	} else {
+	} else if ( strcmp(current->name, "reset") == 0 ){
+		printf("\nEverything has been reset to default\n");
+		reset();
+	}
+	else {
 		displayError(err_command,"n");
 	}
 	return;
@@ -259,4 +267,9 @@ void parseView( command *current, char tokenList[][100], int tokens ){
 
 }
 
-
+void reset( void ){
+	applyDefault();
+	memset((void *)&gameStat,0,sizeof(gameStat));
+	memset((void *)&currentStat,0,sizeof(currentStat));
+	writeSettings();
+}
