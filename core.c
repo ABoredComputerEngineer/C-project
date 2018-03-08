@@ -3,7 +3,7 @@
 #include "settings.h"
 extern settings gameSet;
 extern stat gameStat;
-
+extern stat currentStat;
 /* Initializes the board to the initial state by setting the entire board to empty*/
 void initializeBoard(void){
 	int i,j;
@@ -90,19 +90,27 @@ void playGame(int mode){
 		if ( winner == PLAYER1 ){
 			if ( player1.type == AI ){
 				gameStat.ai.win++;
+				currentStat.ai.win++;
 				gameStat.p1.lose++;
+				currentStat.p1.lose++;
 			}
 			else{
+				currentStat.p1.win++;
 				gameStat.p1.win++;
+				currentStat.ai.lose++;
 				gameStat.ai.lose++;
 			} 
 		} else if ( winner == PLAYER2 ){
 			if ( player2.type == AI ){
+				currentStat.ai.win++;
 				gameStat.ai.win++;
+				currentStat.p1.lose++;
 				gameStat.p1.lose++;
 			}
 			else{
+				currentStat.ai.lose++;
 				gameStat.ai.lose++;
+				currentStat.p1.win++;
 				gameStat.p1.win++;
 			}
 		}
@@ -113,11 +121,15 @@ void playGame(int mode){
 		player2.position = PLAYER2;
 		winner = playDouble();
 		if ( winner == PLAYER1 ){
+			currentStat.p1.win++;
 			gameStat.p1.win++;
+			currentStat.p2.lose++;
 			gameStat.p2.lose++;
 		}
 		else {
+			currentStat.p2.win++;
 			gameStat.p2.win++;
+			currentStat.p1.lose++;
 			gameStat.p1.lose++;
 		}
 	}
@@ -150,6 +162,7 @@ int playSingle( void ){
 		printBoard();
 	}
 	gameStat.gcSingle++;
+	currentStat.gcSingle++;
 	return rv;
 }
 
@@ -169,5 +182,6 @@ int playDouble( void ){
 	}
 
 	gameStat.gcDouble++;
+	currentStat.gcDouble++;
 	return rv;
 }

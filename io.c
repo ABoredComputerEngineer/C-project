@@ -2,7 +2,7 @@
 #include "settings.h"
 extern settings gameSet;
 extern stat gameStat;
-
+extern stat currentStat;
 /* prints the board according to the row type of the game board*/
 
 void printBoard( void ){
@@ -116,13 +116,10 @@ int stringSplit( char in[], char out[][100]){
 
 void displayScore( void ){
 	displayHeading("ScoreCard");
-	printf("%-20s\tWin:%-4d\tLoss:%-4d\n","Player 1",gameStat.p1.win,gameStat.p1.lose);
-	NEWLINE;
-	printf("%-20s\tWin:%-4d\tLoss:%-4d\n","Player 2",gameStat.p2.win,gameStat.p2.lose);
-	NEWLINE;
-	printf("%-20s\tWin:%-4d\tLoss:%-4d\n","Computer",gameStat.ai.win,gameStat.ai.lose);
-	NEWLINE;
-	printf("\n\n");
+	printf("| Current Stats | \n");
+	displayScoreCurrent();
+	printf("| Lifetime Stats | \n");
+	displayScoreLifeTime();
 }
 
 void displayHeading ( char *s ){
@@ -136,7 +133,7 @@ void displayHeading ( char *s ){
 void displayError(enum errors err_type , char *s){
 
 	if ( err_type == err_command ){
-		printf("\n\nInvalid command !! Type \"view help\" to view complete list of commands. Type \"new\" to start a single player game.\n\n " );
+		printf("\n\nInvalid command !! Type \"view help\" to view complete list of commands.\nType \"new\" to start a single player game or \"new 2p\" to start a two player game.\n\n" );
 	} else if ( err_type == err_identifier ){
 		if ( strcmp(s,"new") == 0 ){
 			printf("\nInvalid command!! Use new command as:: \n");
@@ -159,11 +156,11 @@ void displaySetHelp(void){
 	printf("(player_type) is one of the following... \n");
 	printf("p1 : change options for player 1\n");
 	printf("p2 : change options for player 2\n");
-	printf("ai : change options for the computer \n\name");
+	printf("ai : change options for the computer \n\n");
 	printf("(options) is one of the following.... \n");
-	printf("%-5s : change the name. Give a string in the (value). Use double quotes if you want to use space \n","name");
-	printf("%-5s : change the sign used. The (value) is a single character. \n", "sign");
-	printf("%-5s : change the difficulty. Only used with ai. The (value) is \'easy\' , \'medium\' or \'hard\'.\n","mode");
+	printf("%-5s : change the name. Give a string in the (value). \n%8cUse double quotes if you want to use space \n","name",' ');
+	printf("%-5s : change the sign used. The (value) \n%8cis a single character. \n", "sign",' ');
+	printf("%-5s : change the difficulty. Only used with ai.\n%8cThe (value) is \'easy\' , \'medium\' or \'hard\'.\n","mode",' ');
 	NEWLINE;
 }
 
@@ -204,6 +201,10 @@ void displayHelp(void){
 	NEWLINE;
 	printf("| 'exit' Command | Exit the game\n");
 	NEWLINE;
+	printf("| 'reset' Command | \n");
+	NEWLINE;
+	printf("Resets the game settings to default and all scores to 0\n");
+	NEWLINE;
 }
 
 void displayChangeSettings(enum setting set, char *prev, char *current){
@@ -222,9 +223,56 @@ void displayChangeSettings(enum setting set, char *prev, char *current){
 	}
 }
 
-void displayFrontPage( ){
+void displayFrontPage( void ){
 	int i;
-	for ( i = 0; i<40; i++ )
+
+	for ( i = 0; i<80; i++ )
 		putchar('*');
-	putchar('\n');
+	printf("\n");
+	printf("%-79c%c\n",'*','*');
+	printf("*%25c%s%26c\n",' ',"A simple game of Tic-Tac-Toe",'*');
+	printf("%-79c%c\n",'*','*');
+	
+	for ( i = 0; i<80; i++ )
+		putchar('*');
+	printf("\n");
+	printf("%-79c%c\n",'*','*');
+	
+	printf("*%19c%s%20c\n",' ',"Type 'new' to start a single player game",'*');
+	printf("*%19c%s%20c\n",' ',"Type 'new 2p' to start a two player game",'*');
+	
+	printf("*%14c%s%15c\n",' ',"Type 'view help' to view complete list of commands",'*');
+	printf("*%16c%s%16c\n",' ',"Or 'view settings' to view the current settings",'*');
+	printf("*%31c%s%30c\n",' ',"Enjoy the game!!!!",'*');
+	printf("%-79c%c\n",'*','*');
+	printf("%-79c%c\n",'*','*');
+	for ( i = 0; i<80; i++ )
+		putchar('*');
+	printf("\n");
+	
+}
+
+void displayScoreCurrent( void ){
+	NEWLINE;
+	printf("%-20s\tWin: %-4d\tLoss: %-4d\n","Player 1",currentStat.p1.win,currentStat.p1.lose);
+	NEWLINE;
+	printf("%-20s\tWin: %-4d\tLoss: %-4d\n","Player 2",currentStat.p2.win,currentStat.p2.lose);
+	NEWLINE;
+	printf("%-20s\tWin: %-4d\tLoss: %-4d\n","Computer",currentStat.ai.win,currentStat.ai.lose);
+	NEWLINE;
+	printf("%-20s\t%s: %-4d\t%s: %-4d\n","Games Played","Single",currentStat.gcSingle,"Two Player",currentStat.gcDouble);
+	NEWLINE;
+}
+
+void displayScoreLifeTime( void ){
+	NEWLINE;
+	printf("%-20s\tWin: %-4d\tLoss: %-4d\n","Player 1",gameStat.p1.win,gameStat.p1.lose);
+	NEWLINE;
+	printf("%-20s\tWin: %-4d\tLoss: %-4d\n","Player 2",gameStat.p2.win,gameStat.p2.lose);
+	NEWLINE;
+	printf("%-20s\tWin: %-4d\tLoss: %-4d\n","Computer",gameStat.ai.win,gameStat.ai.lose);
+	NEWLINE;
+	printf("%-20s\t%s: %-4d\t%s: %-4d\n","Games Played","Single",gameStat.gcSingle,"Two Player",gameStat.gcDouble);
+	NEWLINE;
+	printf("\n\n");
 }
