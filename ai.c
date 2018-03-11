@@ -57,6 +57,7 @@ aiBoard getBestMove( player current , int depth ){
 	for ( i = 0; i<9 ; i++ ){
 		if ( gameBoard.row[i] == ' ' ){
 			performMove( i , current.position );
+			// printBoard();
 			if ( current.type == AI )
 				score = getBestMove( human, depth + 1 ).score;
 			 else
@@ -66,7 +67,12 @@ aiBoard getBestMove( player current , int depth ){
 			new[x++].move = i;
 		}
 	}
+	
 
+	// for ( i = 0; new[i].score!=GARBAGE &&i<9; i++ )
+	// 	printf("Score: %d\tMove:%d\t%s\n",new[i].score,new[i].move,(current.type==AI)?"AI":"Human");
+	// putchar('\n');
+	
 	move = getRandomMove( new, current );
 	free(new);
 	return move;

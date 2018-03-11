@@ -276,3 +276,15 @@ void displayScoreLifeTime( void ){
 	NEWLINE;
 	printf("\n\n");
 }
+
+void displayCredits(void){
+	printf("\n\n");	
+	NEWLINE;
+	printf("\nThe game is developed by:: \n");
+	printf("%-20s%-20s\n","Amrit Pun","074BEX404");
+	printf("%-20s%-20s\n","Asim Maharjan","074BEX408");
+	printf("%-20s%-20s\n","Pratik Budathoki","074BEX429");
+	printf("%-20s%-20s\n","Shiva Ram Godar","074BEX442");
+	NEWLINE;
+	printf("\n\n");
+}
