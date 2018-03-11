@@ -86,7 +86,7 @@ void displaySetHelp(void);
 void displayNewHelp(void);
 void displayHelp(void);
 void displayHeading(char *);
-
+void displayCredits(void);
 enum setting {name,ai_name,sign,mode}; // required for error handling
 
 void displayChangeSettings(enum setting, char *, char *);

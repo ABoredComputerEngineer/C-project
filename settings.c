@@ -259,7 +259,7 @@ void parseView( command *current, char tokenList[][100], int tokens ){
 		} else if ( strcmp(identify->name, "help") == 0 ){
 			displayHelp();
 		} else if ( strcmp(identify->name, "credits") == 0 ){
-			printf("Printing Credits\n");
+			displayCredits();
 		} else {
 			displayError(err_identifier,current->name);
 			return;

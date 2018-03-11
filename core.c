@@ -6,10 +6,7 @@ extern stat gameStat;
 extern stat currentStat;
 /* Initializes the board to the initial state by setting the entire board to empty*/
 void initializeBoard(void){
-	int i,j;
-	for ( i = 0; i<BOARD_ROW ; i++ )
-		for ( j = 0; j<BOARD_COL; j++ )
-			gameBoard.mat[i][j] = ' ';
+	int i;
 	for ( i = 0; i<BOARD; i++ )
 		gameBoard.row[i] = ' ';
 }
