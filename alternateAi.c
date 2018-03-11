@@ -97,7 +97,7 @@ void displaySettings( void ); // Displays the game settings
 void displayFrontPage( void );
 void displayScoreCurrent( void );
 void displayScoreLifeTime( void );
-
+void displayCredits(void);
 
 /* Declaration of the Global Variables. Almost required in all functions */
 game gameBoard; // the game stored in 1D array
@@ -448,7 +448,7 @@ void parseView( command *current, char tokenList[][100], int tokens ){
 		} else if ( strcmp(identify->name, "help") == 0 ){
 			displayHelp();
 		} else if ( strcmp(identify->name, "credits") == 0 ){
-			printf("Printing Credits\n");
+			displayCredits();
 		} else {
 			displayError(err_identifier,current->name);
 			return;
@@ -468,10 +468,7 @@ void reset( void ){
 
 /* Initializes the board to the initial state by setting the entire board to empty*/
 void initializeBoard(void){
-	int i,j;
-	for ( i = 0; i<BOARD_ROW ; i++ )
-		for ( j = 0; j<BOARD_COL; j++ )
-			gameBoard.mat[i][j] = ' ';
+	int i;
 	for ( i = 0; i<BOARD; i++ )
 		gameBoard.row[i] = ' ';
 }
@@ -693,6 +690,7 @@ aiBoard getBestMove( player current , int depth ){
 	for ( i = 0; i<9 ; i++ ){
 		if ( gameBoard.row[i] == ' ' ){
 			performMove( i , current.position );
+				// printBoard();
 			if ( current.type == AI )
 				score = getBestMove( human, depth + 1 ).score;
 			 else
@@ -702,6 +700,10 @@ aiBoard getBestMove( player current , int depth ){
 			new[x++].move = i;
 		}
 	}
+
+	// for ( i = 0; new[i].score!=GARBAGE &&i<9; i++ )
+	// 	printf("Score: %d\tMove:%d\t%s\n",new[i].score,new[i].move,(current.type==AI)?"AI":"Human");
+	// putchar('\n');
 
 	move = getRandomMove( new, current );
 	free(new);
@@ -1068,6 +1070,18 @@ void displayScoreLifeTime( void ){
 	printf("%-20s\tWin: %-4d\tLoss: %-4d\n","Computer",gameStat.ai.win,gameStat.ai.lose);
 	NEWLINE;
 	printf("%-20s\t%s: %-4d\t%s: %-4d\n","Games Played","Single",gameStat.gcSingle,"Two Player",gameStat.gcDouble);
+	NEWLINE;
+	printf("\n\n");
+}
+
+void displayCredits(void){
+	printf("\n\n");	
+	NEWLINE;
+	printf("\nThe game is developed by:: \n");
+	printf("%-20s%-20s\n","Amrit Pun","074BEX404");
+	printf("%-20s%-20s\n","Asim Maharjan","074BEX408");
+	printf("%-20s%-20s\n","Pratik Budathoki","074BEX429");
+	printf("%-20s%-20s\n","Shiva Ram Godar","074BEX442");
 	NEWLINE;
 	printf("\n\n");
 }
